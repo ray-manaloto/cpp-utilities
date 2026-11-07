@@ -52,6 +52,12 @@ check("refuses a weaker level than a bare flag means" "${msan}"
 check("refuses -fno-<x> after the written-out level" "${msan}"
   "-fsanitize=memory -fsanitize-memory-track-origins" "-fsanitize-memory-track-origins=2 -fno-sanitize-memory-track-origins"
   "CMAKE_CXX_FLAGS_DEBUG has -fno-sanitize-memory-track-origins after -fsanitize-memory-track-origins, which the profile adds")
+check("sees a sanitizer override after other bracket forms" "-fsanitize=address"
+  "-fsanitize=address -DA=[a;b] -DB=]=] -DC=[[x" "-fno-sanitize=all"
+  "CMAKE_CXX_FLAGS_DEBUG turns off sanitizer address, which the profile turns on")
+check("refuses a weaker level after the written-out level in place of the bare flag" "${msan}"
+  "-fsanitize=memory -fsanitize-memory-track-origins=2" "-fsanitize-memory-track-origins=0"
+  "CMAKE_CXX_FLAGS_DEBUG has -fsanitize-memory-track-origins=0 after -fsanitize-memory-track-origins, which the profile adds")
 
 if(failures)
   message(FATAL_ERROR "${failures} override check case(s) failed")

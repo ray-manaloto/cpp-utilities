@@ -7,16 +7,39 @@ include_guard(GLOBAL)
 # Sets <out> to the arguments in <flags>, as the compiler reads them. A list
 # item ends at a ';' outside square brackets, so an argument may not hold its
 # own ';', '[' or ']', as -DSEP="a;b" or -DLBRACKET=[ do: each stands in as
-# ASCII 1, 2 or 3 until _profile_undone_in puts it back in a refusal.
+# ASCII 1, 2 or 3 until _profile_untokens puts it back.
 function(_profile_tokens flags out)
   string(ASCII 1 semicolon)
-  string(ASCII 2 open)
-  string(ASCII 3 close)
+  string(ASCII 2 lbracket)
+  string(ASCII 3 rbracket)
   string(REPLACE ";" "${semicolon}" flags "${flags}")
-  string(REPLACE "[" "${open}" flags "${flags}")
-  string(REPLACE "]" "${close}" flags "${flags}")
+  string(REPLACE "[" "${lbracket}" flags "${flags}")
+  string(REPLACE "]" "${rbracket}" flags "${flags}")
   separate_arguments(tokens NATIVE_COMMAND "${flags}")
   set(${out} "${tokens}" PARENT_SCOPE)
+endfunction()
+
+# Sets <out> to the list <items>, with the stand-ins _profile_tokens put in
+# its tokens turned back into '\;', '[' and ']'.
+function(_profile_untokens items out)
+  string(ASCII 1 semicolon)
+  string(ASCII 2 lbracket)
+  string(ASCII 3 rbracket)
+  string(REPLACE "${semicolon}" "\\;" items "${items}")
+  string(REPLACE "${lbracket}" "[" items "${items}")
+  string(REPLACE "${rbracket}" "]" items "${items}")
+  set(${out} "${items}" PARENT_SCOPE)
+endfunction()
+
+# Sets <out> to the written-out form of the bare flag <flag>, -f<x>=<value>
+# with the value a bare -f<x> means, or to "" where none is known.
+function(_profile_written_out flag out)
+  set(value_-fsanitize-memory-track-origins 2)
+  if(DEFINED value_${flag})
+    set(${out} "${flag}=${value_${flag}}" PARENT_SCOPE)
+  else()
+    set(${out} "" PARENT_SCOPE)
+  endif()
 endfunction()
 
 # Sets <out> to a refusal for each flag in <required> that a later flag in
@@ -27,8 +50,8 @@ endfunction()
 # - -f<x> after -fno-<x>, or -fno-<x> or -f<x>=<value> after -f<x>, or
 #   -fno-<x> after -f<x>=<value>;
 # - -<opt>=<other> after -<opt>=<value>.
-# -f<x>=<value> is not an undo when <value> is what a bare -f<x> means, as 2 is
-# for -fsanitize-memory-track-origins.
+# The written-out form of a bare flag (_profile_written_out) stands for it:
+# it is no undo, and a later flag can undo it.
 # Flags a project adds itself, such as with add_compile_options, are not seen,
 # nor is turning off one check of a group, such as -fno-sanitize=alignment
 # under -fsanitize=undefined.
@@ -81,23 +104,19 @@ function(_profile_undone required vars out)
     endif()
   endforeach()
 
-  # The value a bare -f<x> means, where a flag may also take one.
-  set(bare_-fsanitize-memory-track-origins 2)
   foreach(flag IN LISTS required)
     if(flag MATCHES "^-f(no-)?sanitize=")
       continue()
     endif()
     set(negation "")
     set(prefix "")
-    set(same "")
+    set(written_out "")
     if(flag MATCHES "^-fno-([^=]+)$")
       set(negation "-f${CMAKE_MATCH_1}")
     elseif(flag MATCHES "^-f([^=]+)$")
       set(negation "-fno-${CMAKE_MATCH_1}")
       set(prefix "${flag}=")
-      if(DEFINED bare_${flag})
-        set(same "${flag}=${bare_${flag}}")
-      endif()
+      _profile_written_out("${flag}" written_out)
     elseif(flag MATCHES "^(-[^=]+=)")
       set(prefix "${CMAKE_MATCH_1}")
       if(flag MATCHES "^-f([^=]+)=")
@@ -107,7 +126,7 @@ function(_profile_undone required vars out)
     set(last -1)
     set(i 0)
     foreach(token IN LISTS tokens_in_order)
-      if(token STREQUAL flag)
+      if(token STREQUAL flag OR (written_out AND token STREQUAL written_out))
         set(last ${i})
       endif()
       math(EXPR i "${i} + 1")
@@ -120,7 +139,7 @@ function(_profile_undone required vars out)
       if(i GREATER last)
         string(FIND "${token}" "${prefix}" at)
         if((negation AND token STREQUAL negation)
-            OR (prefix AND at EQUAL 0 AND NOT token STREQUAL same))
+            OR (prefix AND at EQUAL 0 AND NOT token STREQUAL written_out))
           list(GET token_vars ${i} var)
           list(APPEND refusals "${var} has ${token} after ${flag}, which the profile adds")
         endif()
@@ -153,12 +172,7 @@ function(_profile_undone_in required base out)
     endif()
   endforeach()
   list(REMOVE_DUPLICATES found)
-  string(ASCII 1 semicolon)
-  string(ASCII 2 open)
-  string(ASCII 3 close)
-  string(REPLACE "${semicolon}" "\\;" found "${found}")
-  string(REPLACE "${open}" "[" found "${found}")
-  string(REPLACE "${close}" "]" found "${found}")
+  _profile_untokens("${found}" found)
   set(all "${${out}}")
   if(found)
     list(APPEND all "${found}")
