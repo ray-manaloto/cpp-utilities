@@ -62,7 +62,10 @@ endfunction()
 # quoting, nesting and relative-path rules exactly. -Wl,@<file> is let through:
 # it goes to the linker, which does not read -fsanitize or -fno-sanitize.
 # CCC_OVERRIDE_OPTIONS, an environment variable that edits clang's arguments,
-# is a known gap: the check does not see the environment.
+# is a known gap: the check does not see the environment. Another is
+# forwarding options, such as -Xclang -disable-llvm-passes, whose effect on
+# instrumentation is not modelled; -Xarch_<arch> is read as if it did not
+# scope the flag after it.
 function(_profile_undone required vars out)
   set(refusals "")
   string(ASCII 1 semicolon)
