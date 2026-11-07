@@ -9,6 +9,7 @@
 #   import std is asked for and unavailable.
 include_guard(GLOBAL)
 include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ProfileOverrides.cmake")
 include(CheckCompilerFlag)
 include(CheckLinkerFlag)
 include(CheckIPOSupported)

@@ -10,6 +10,7 @@ import "../compilers.pkl"
 import "../profile.pkl"
 import "../rules.pkl"
 import "../settings.pkl"
+import "../render/triplets.pkl"
 
 local function mac(c: axes.Compiler): profile.Profile = new { system = "macos"; compiler = c }
 local function linux(c: axes.Compiler): profile.Profile = new { system = "linux"; compiler = c }
@@ -121,9 +122,14 @@ facts {
       && emitted.keys.filter((k) -> k.startsWith("cmake/profile/triplets/")).length == valid.length
       && emitted.containsKey("cmake/profile/ProfileRules.cmake")
       && emitted.containsKey("cmake/profile/ProfileCheck.cmake")
+      && emitted.containsKey("cmake/profile/ProfileOverrides.cmake")
       && emitted.containsKey("cmake/profile/ProfileToolchain.cmake")
       && emitted.containsKey("cmake/profile/ProfileCommon.cmake")
       && emitted.containsKey("cmake/profile/profile-data.cmake")
+  }
+  ["a triplet hashes the files that build a dependency, not the override check"] {
+    let (triplet = triplets.text(valid.first))
+      triplet.contains("ProfileCommon.cmake") && !triplet.contains("ProfileOverrides.cmake")
   }
 }
 

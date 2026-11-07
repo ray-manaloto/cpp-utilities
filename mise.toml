@@ -30,9 +30,9 @@ run = "tools/fixture-schema.sh"
 description = "Configure, build and test every fixture preset for this machine"
 run = "tools/fixture-build.sh"
 
-[tasks."fixture:undone"]
+[tasks."test:overrides"]
 description = "Unit-test the override check on flags no local compiler accepts"
-run = "cmake -P tools/undone-test.cmake"
+run = "cmake -P tools/overrides-test.cmake"
 
 [tasks."fixture:refusals"]
 description = "Check configure refuses ruled overrides (macOS)"
@@ -40,4 +40,4 @@ run = "tools/fixture-refusals.sh"
 
 [tasks.check]
 description = "Run every check"
-depends = ["test", "fixture:fresh", "fixture:schema", "fixture:build", "fixture:undone", "fixture:refusals"]
+depends = ["test", "fixture:fresh", "fixture:schema", "fixture:build", "test:overrides", "fixture:refusals"]
