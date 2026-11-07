@@ -1,7 +1,7 @@
 #!/bin/sh
 # Configures the fixture with overrides each profile must refuse, and checks
-# that configure stops with the expected reason. Run from the repo root on
-# macOS after `mise run fixture:generate`.
+# that configure stops with the expected reason. macOS only: the cases name
+# macOS profiles and Homebrew's g++-16.
 set -eu
 cd "$(dirname "$0")/../fixture"
 work=$(mktemp -d)
