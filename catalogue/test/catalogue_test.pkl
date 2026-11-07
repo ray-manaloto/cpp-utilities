@@ -10,6 +10,8 @@ import "../compilers.pkl"
 import "../profile.pkl"
 import "../rules.pkl"
 import "../settings.pkl"
+import "../render/presets.pkl"
+import "../render/triplets.pkl"
 
 local function mac(c: axes.Compiler): profile.Profile = new { system = "macos"; compiler = c }
 local function linux(c: axes.Compiler): profile.Profile = new { system = "linux"; compiler = c }
@@ -26,6 +28,7 @@ local witnesses: Map<String, profile.Profile> = Map(
   "sanitizer_hwasan_arch", (linux("clang23_1_4")) { sanitizers = Set("hwasan") },
   "sanitizer_nsan_arch", (linux("clang23_1_4")) { arch = "arm64"; targetCpu = "arm64"; sanitizers = Set("nsan") },
   "sanitizer_macos", (mac("clang23_1_4")) { sanitizers = Set("asan") },
+  "sanitizer_gcc_macos", (mac("gcc16_2_0")) { sanitizers = Set("ubsan") },
   "xray_clang", (linux("gcc16_2_0")) { instrumentation = "xray" },
   "xray_macos", (mac("clang23_1_4")) { instrumentation = "xray" },
   "bolt_macos", (mac("clang23_1_4")) { instrumentation = "bolt" },
@@ -106,6 +109,14 @@ facts {
   ["context axes change the rules but not the name"] {
     (linux("gcc16_2_0")) { launcher = "sccache"; generator = "unix_makefiles" }.name == linux("gcc16_2_0").name
   }
+  ["gcc on macos refuses every sanitizer, with a message that says why"] {
+    List("ubsan", "asan").every((s) -> refusedIds((mac("gcc16_2_0")) { sanitizers = Set(s) }).contains("sanitizer_gcc_macos"))
+    refusedIds((mac("gcc16_2_0")) { sanitizers = Set("asan", "ubsan") }).contains("sanitizer_gcc_macos")
+    test.catch(() -> (mac("gcc16_2_0")) { sanitizers = Set("ubsan") }.validated).contains("libubsan")
+    // Only the sanitizers are refused: gcc on macos without one, and gcc on linux with one, pass.
+    refusedIds(mac("gcc16_2_0")).isEmpty
+    refusedIds((linux("gcc16_2_0")) { sanitizers = Set("ubsan", "asan") }).isEmpty
+  }
   ["a refused profile throws every refusal"] {
     let (msg = test.catch(() -> (mac("gcc14_2_0")) { instrumentation = "bolt"; sanitizers = Set("tsan") }.validated))
       msg.contains("compiler_system_gcc14_2_0") && msg.contains("bolt_macos") && msg.contains("sanitizer_macos")
@@ -121,9 +132,19 @@ facts {
       && emitted.keys.filter((k) -> k.startsWith("cmake/profile/triplets/")).length == valid.length
       && emitted.containsKey("cmake/profile/ProfileRules.cmake")
       && emitted.containsKey("cmake/profile/ProfileCheck.cmake")
+      && emitted.containsKey("cmake/profile/ProfileOverrides.cmake")
       && emitted.containsKey("cmake/profile/ProfileToolchain.cmake")
       && emitted.containsKey("cmake/profile/ProfileCommon.cmake")
       && emitted.containsKey("cmake/profile/profile-data.cmake")
+  }
+  ["a profile preset keeps its identity and toolchain file in the environment, which a deleted cache leaves"] {
+    let (file = presets.profilesFile(valid, "D"))
+      file["configurePresets"].first["environment"] == Map("CMAKE_TOOLCHAIN_FILE", "D/ProfileToolchain.cmake", "PROFILE_SOURCE_DIR", "${sourceDir}")
+      && file["configurePresets"].drop(1).every((c) -> c["environment"] == Map("PROFILE_PRESET", c["name"]))
+  }
+  ["a triplet hashes the files that build a dependency, not the override check"] {
+    let (triplet = triplets.text(valid.first))
+      triplet.contains("ProfileCommon.cmake") && !triplet.contains("ProfileOverrides.cmake")
   }
 }
 

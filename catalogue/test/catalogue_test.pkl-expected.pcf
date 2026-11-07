@@ -607,6 +607,10 @@ examples {
           "name": "profile-base",
           "hidden": true,
           "toolchainFile": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+          "environment": {
+            "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+            "PROFILE_SOURCE_DIR": "${sourceDir}"
+          },
           "cacheVariables": {
             "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/cmake/profile/ProfileRules.cmake",
             "CMAKE_PROJECT_INCLUDE": "${sourceDir}/cmake/profile/ProfileCheck.cmake"
@@ -631,6 +635,9 @@ examples {
             "reflection-refl_off",
             "pch-pch_off"
           ],
+          "environment": {
+            "PROFILE_PRESET": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+          },
           "cacheVariables": {
             "PROFILE_NAME": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
           }
@@ -654,6 +661,9 @@ examples {
             "reflection-refl_on",
             "pch-pch_off"
           ],
+          "environment": {
+            "PROFILE_PRESET": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+          },
           "cacheVariables": {
             "PROFILE_NAME": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
           }
@@ -854,7 +864,7 @@ examples {
     set(PROFILE_FLAG_17_LANGUAGES "CXX")
     set(PROFILE_FLAG_17_COMPILE "-freflection" "-fexpansion-statements")
     set(PROFILE_FLAG_17_LINK)
-    set(PROFILE_RULES "compiler_system_gcc14_2_0" "compiler_system_appleclang21_0_0" "sanitizer_tsan_asan" "sanitizer_tsan_msan" "sanitizer_msan_asan" "sanitizer_hwasan_asan" "sanitizer_clang" "sanitizer_hwasan_arch" "sanitizer_nsan_arch" "sanitizer_macos" "xray_clang" "xray_macos" "bolt_macos" "cpu_arm64" "cpu_amd64" "reflection_standard" "reflection_compiler" "importstd_compiler" "importstd_generator" "importstd_standard" "pch_sccache")
+    set(PROFILE_RULES "compiler_system_gcc14_2_0" "compiler_system_appleclang21_0_0" "sanitizer_tsan_asan" "sanitizer_tsan_msan" "sanitizer_msan_asan" "sanitizer_hwasan_asan" "sanitizer_clang" "sanitizer_hwasan_arch" "sanitizer_nsan_arch" "sanitizer_macos" "sanitizer_gcc_macos" "xray_clang" "xray_macos" "bolt_macos" "cpu_arm64" "cpu_amd64" "reflection_standard" "reflection_compiler" "importstd_compiler" "importstd_generator" "importstd_standard" "pch_sccache")
     set(PROFILE_RULE_compiler_system_gcc14_2_0_MESSAGE "gcc14_2_0 runs on linux only")
     set(PROFILE_RULE_compiler_system_gcc14_2_0_CONDITIONS "1" "2")
     set(PROFILE_RULE_compiler_system_gcc14_2_0_1_AXIS "compiler")
@@ -935,6 +945,17 @@ examples {
     set(PROFILE_RULE_sanitizer_macos_2_AXIS "sanitizer")
     set(PROFILE_RULE_sanitizer_macos_2_NEGATED "TRUE")
     set(PROFILE_RULE_sanitizer_macos_2_VALUES "none" "ubsan" "asan_ubsan")
+    set(PROFILE_RULE_sanitizer_gcc_macos_MESSAGE "gcc on macos runs no sanitizer: the conda g++ has no libasan or libubsan")
+    set(PROFILE_RULE_sanitizer_gcc_macos_CONDITIONS "1" "2" "3")
+    set(PROFILE_RULE_sanitizer_gcc_macos_1_AXIS "system")
+    set(PROFILE_RULE_sanitizer_gcc_macos_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_gcc_macos_1_VALUES "macos")
+    set(PROFILE_RULE_sanitizer_gcc_macos_2_AXIS "compiler")
+    set(PROFILE_RULE_sanitizer_gcc_macos_2_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_gcc_macos_2_VALUES "gcc16_2_0" "gcc14_2_0")
+    set(PROFILE_RULE_sanitizer_gcc_macos_3_AXIS "sanitizer")
+    set(PROFILE_RULE_sanitizer_gcc_macos_3_NEGATED "TRUE")
+    set(PROFILE_RULE_sanitizer_gcc_macos_3_VALUES "none")
     set(PROFILE_RULE_xray_clang_MESSAGE "xray needs a clang compiler")
     set(PROFILE_RULE_xray_clang_CONDITIONS "1" "2")
     set(PROFILE_RULE_xray_clang_1_AXIS "instrumentation")
@@ -1096,6 +1117,29 @@ examples {
     # and starts the flag variables with the flags the profile adds. The check
     # module then refuses any compiler or flag that differs from the profile.
     include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+    
+    # A Profile preset sets PROFILE_PRESET in the environment as well as PROFILE_* in
+    # the cache. A changed compiler makes CMake delete the cache and configure again
+    # without the preset's cache variables: no PROFILE_* is left, and with it go the
+    # rules module and the check module. The environment survives, so a build that
+    # has the preset's name but none of its values stops here instead of running
+    # unchecked. (A vcpkg triplet passes the ABI axes, so PROFILE_COMPILER is set there.)
+    # PROFILE_SOURCE_DIR limits this to the preset's own source tree: a child build
+    # that inherits the environment, such as an ExternalProject or a try_compile
+    # project, has another source directory and is left alone.
+    # Such a child returns at once, so the flags it set for itself stay. Known
+    # gap: a child that configures this same source directory into another build
+    # directory looks like a lost cache and is refused.
+    if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER
+        AND "${CMAKE_SOURCE_DIR}" STREQUAL "$ENV{PROFILE_SOURCE_DIR}")
+      message(FATAL_ERROR "Profile $ENV{PROFILE_PRESET}: the build directory lost the profile. "
+        "Changing CMAKE_C_COMPILER or CMAKE_CXX_COMPILER on an existing build directory makes "
+        "CMake delete its cache, and the profile's values and checks with it. "
+        "Delete the build directory and configure the preset again.")
+    endif()
+    if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER)
+      return()
+    endif()
     
     foreach(axis IN LISTS PROFILE_NAME_AXES)
       string(TOUPPER "PROFILE_${axis}" var)
@@ -1283,11 +1327,14 @@ examples {
     # CMAKE_PROJECT_INCLUDE; ProfileRules.cmake has already checked the axis values
     # and rules. It stops configure, listing every reason, when:
     # - a compiler's ID, version or fork commit is not the profile's compiler;
-    # - a CMake setting the profile owns, or a flag its toolchain adds, was overridden;
+    # - a CMake setting the profile owns, or a flag its toolchain adds, was overridden,
+    #   including by a later flag that undoes it, in the base or a configuration's
+    #   flags variable;
     # - the compiler or linker refuses a flag the profile adds, or IPO or
     #   import std is asked for and unavailable.
     include_guard(GLOBAL)
     include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+    include("${CMAKE_CURRENT_LIST_DIR}/ProfileOverrides.cmake")
     include(CheckCompilerFlag)
     include(CheckLinkerFlag)
     include(CheckIPOSupported)
@@ -1351,12 +1398,14 @@ examples {
       foreach(lang IN LISTS languages)
         profile_flags(${lang} compile lang_link)
         list(APPEND link ${lang_link})
-        separate_arguments(actual NATIVE_COMMAND "${CMAKE_${lang}_FLAGS}")
+        _profile_tokens("${CMAKE_${lang}_FLAGS}" actual)
         foreach(flag IN LISTS compile)
-          if(NOT flag IN_LIST actual)
+          _profile_written_out("${flag}" written_out)
+          if(NOT flag IN_LIST actual AND NOT (written_out AND written_out IN_LIST actual))
             list(APPEND refusals "CMAKE_${lang}_FLAGS lacks ${flag}, which the profile adds")
           endif()
         endforeach()
+        _profile_undone_in("${compile}" CMAKE_${lang}_FLAGS refusals)
         set(CMAKE_REQUIRED_QUIET ON)
         foreach(flag IN LISTS compile)
           string(MAKE_C_IDENTIFIER "PROFILE_HAS_${lang}_FLAG_${flag}" result)
@@ -1368,7 +1417,10 @@ examples {
         endforeach()
       endforeach()
       list(REMOVE_DUPLICATES link)
-      separate_arguments(actual NATIVE_COMMAND "${CMAKE_EXE_LINKER_FLAGS}")
+      _profile_tokens("${CMAKE_EXE_LINKER_FLAGS}" actual)
+      foreach(kind IN ITEMS EXE SHARED MODULE)
+        _profile_undone_in("${link}" CMAKE_${kind}_LINKER_FLAGS refusals)
+      endforeach()
       foreach(flag IN LISTS link)
         if(NOT flag IN_LIST actual)
           list(APPEND refusals "CMAKE_EXE_LINKER_FLAGS lacks ${flag}, which the profile adds")
@@ -1402,6 +1454,214 @@ examples {
     endfunction()
     
     _profile_check_build()
+    
+    """#
+  }
+  ["cmake/profile/ProfileOverrides.cmake"] {
+    #"""
+    # The override check ProfileCheck.cmake runs: does a later flag undo one the
+    # profile adds? It lives apart from ProfileCommon.cmake, which the triplets
+    # hash for vcpkg's binary cache, because it never changes how a dependency
+    # is built. tools/overrides-test.cmake tests it with cmake -P.
+    include_guard(GLOBAL)
+    
+    # Sets <out> to the arguments in <flags>, as the compiler reads them. A list
+    # item ends at a ';' outside square brackets, so an argument may not hold its
+    # own ';', '[' or ']', as -DSEP="a;b" or -DLBRACKET=[ do: each stands in as
+    # ASCII 1, 2 or 3 until _profile_untokens puts it back.
+    function(_profile_tokens flags out)
+      string(ASCII 1 semicolon)
+      string(ASCII 2 lbracket)
+      string(ASCII 3 rbracket)
+      string(REPLACE ";" "${semicolon}" flags "${flags}")
+      string(REPLACE "[" "${lbracket}" flags "${flags}")
+      string(REPLACE "]" "${rbracket}" flags "${flags}")
+      separate_arguments(tokens NATIVE_COMMAND "${flags}")
+      set(${out} "${tokens}" PARENT_SCOPE)
+    endfunction()
+    
+    # Sets <out> to the list <items>, with the stand-ins _profile_tokens put in
+    # its tokens turned back into '\;', '[' and ']'.
+    function(_profile_untokens items out)
+      string(ASCII 1 semicolon)
+      string(ASCII 2 lbracket)
+      string(ASCII 3 rbracket)
+      string(REPLACE "${semicolon}" "\\;" items "${items}")
+      string(REPLACE "${lbracket}" "[" items "${items}")
+      string(REPLACE "${rbracket}" "]" items "${items}")
+      set(${out} "${items}" PARENT_SCOPE)
+    endfunction()
+    
+    # Sets <out> to the written-out form of the bare flag <flag>, -f<x>=<value>
+    # with the value a bare -f<x> means, or to "" where none is known.
+    function(_profile_written_out flag out)
+      set(value_-fsanitize-memory-track-origins 2)
+      if(DEFINED value_${flag})
+        set(${out} "${flag}=${value_${flag}}" PARENT_SCOPE)
+      else()
+        set(${out} "" PARENT_SCOPE)
+      endif()
+    endfunction()
+    
+    # Sets <out> to a refusal for each flag in <required> that a later flag in
+    # <vars> undoes. <vars> are read in order, as the compiler sees them: the base
+    # variable, then a configuration's. A flag is undone by:
+    # - -fno-sanitize=<names> or =all, for a sanitizer a -fsanitize= flag turns on,
+    #   unless a later -fsanitize= turns it on again;
+    # - -f<x> after -fno-<x>, or -fno-<x> or -f<x>=<value> after -f<x>, or
+    #   -fno-<x> after -f<x>=<value>;
+    # - -<opt>=<other> after -<opt>=<value>.
+    # The written-out form of a bare flag (_profile_written_out) stands for it:
+    # it is no undo, and a later flag can undo it.
+    # Flags a project adds itself, such as with add_compile_options, are not seen,
+    # nor is turning off one check of a group, such as -fno-sanitize=alignment
+    # under -fsanitize=undefined.
+    # Flags the check cannot read are refused whole: an argument starting with '@'
+    # (a response file) and clang's --config, --config=<file>, --config-system-dir=
+    # and --config-user-dir= (configuration files), as any of them may hold a flag
+    # that undoes one. Reading those files here would mean matching the compilers'
+    # quoting, nesting and relative-path rules exactly. -Wl,@<file> is let through:
+    # it goes to the linker, which does not read -fsanitize or -fno-sanitize.
+    # Forwarding options are refused whole too: -Xclang (also as -Xclang=<argument>) passes the next argument
+    # straight to the compiler front end (as -Xclang -disable-llvm-passes does), and
+    # -Xarch_<arch> scopes the next argument to one architecture, so neither can be
+    # read as the flag it carries. Any -Xclang or -Xarch_* token is refused, in the
+    # base or a configuration's variable.
+    # CCC_OVERRIDE_OPTIONS, an environment variable that edits clang's arguments,
+    # is a known gap: the check does not see the environment. Others are
+    # -mllvm <option> and -Xpreprocessor/-Xassembler/-Xlinker, which pass an
+    # argument on and are not refused.
+    function(_profile_undone required vars out)
+      set(refusals "")
+      string(ASCII 1 semicolon)
+      set(tokens_in_order "")
+      set(token_vars "")
+      foreach(var IN LISTS vars)
+        _profile_tokens("${${var}}" tokens)
+        foreach(token IN LISTS tokens)
+          if(token MATCHES "^@")
+            list(APPEND refusals "${var} has ${token}, a response file the check can't read")
+          elseif(token MATCHES "^--config(-system-dir|-user-dir)?(=|$)")
+            list(APPEND refusals "${var} has ${token}, a configuration file the check can't read")
+          elseif(token MATCHES "^-Xclang(=|$)" OR token MATCHES "^-Xarch_")
+            list(APPEND refusals "${var} has ${token}, a forwarding option the check can't read")
+          endif()
+          list(APPEND tokens_in_order "${token}")
+          list(APPEND token_vars "${var}")
+        endforeach()
+      endforeach()
+    
+      set(wanted "")
+      foreach(flag IN LISTS required)
+        if(flag MATCHES "^-fsanitize=(.+)$")
+          string(REPLACE "," ";" names "${CMAKE_MATCH_1}")
+          list(APPEND wanted ${names})
+        endif()
+      endforeach()
+      set(enabled "")
+      set(i 0)
+      foreach(token IN LISTS tokens_in_order)
+        list(GET token_vars ${i} var)
+        math(EXPR i "${i} + 1")
+        if(token MATCHES "^-f(no-)?sanitize=(.+)$")
+          set(negated "${CMAKE_MATCH_1}")
+          # A bare ';' separates names here, as a ',' does.
+          string(REGEX REPLACE "[,${semicolon}]" ";" names "${CMAKE_MATCH_2}")
+          if(negated AND "all" IN_LIST names)
+            set(names ${wanted})
+          endif()
+          foreach(name IN LISTS names)
+            if(negated)
+              list(REMOVE_ITEM enabled "${name}")
+              set(off_${name} "${var}")
+            else()
+              list(APPEND enabled "${name}")
+              unset(off_${name})
+            endif()
+          endforeach()
+        endif()
+      endforeach()
+      foreach(name IN LISTS wanted)
+        if(NOT name IN_LIST enabled AND DEFINED off_${name})
+          list(APPEND refusals "${off_${name}} turns off sanitizer ${name}, which the profile turns on")
+        endif()
+      endforeach()
+    
+      foreach(flag IN LISTS required)
+        if(flag MATCHES "^-f(no-)?sanitize=")
+          continue()
+        endif()
+        set(negation "")
+        set(prefix "")
+        set(written_out "")
+        if(flag MATCHES "^-fno-([^=]+)$")
+          set(negation "-f${CMAKE_MATCH_1}")
+        elseif(flag MATCHES "^-f([^=]+)$")
+          set(negation "-fno-${CMAKE_MATCH_1}")
+          set(prefix "${flag}=")
+          _profile_written_out("${flag}" written_out)
+        elseif(flag MATCHES "^(-[^=]+=)")
+          set(prefix "${CMAKE_MATCH_1}")
+          if(flag MATCHES "^-f([^=]+)=")
+            set(negation "-fno-${CMAKE_MATCH_1}")
+          endif()
+        endif()
+        set(last -1)
+        set(i 0)
+        foreach(token IN LISTS tokens_in_order)
+          if(token STREQUAL flag OR (written_out AND token STREQUAL written_out))
+            set(last ${i})
+          endif()
+          math(EXPR i "${i} + 1")
+        endforeach()
+        if(last LESS 0)
+          continue()
+        endif()
+        set(i 0)
+        foreach(token IN LISTS tokens_in_order)
+          if(i GREATER last)
+            string(FIND "${token}" "${prefix}" at)
+            if((negation AND token STREQUAL negation)
+                OR (prefix AND at EQUAL 0 AND NOT token STREQUAL written_out))
+              list(GET token_vars ${i} var)
+              list(APPEND refusals "${var} has ${token} after ${flag}, which the profile adds")
+            endif()
+          endif()
+          math(EXPR i "${i} + 1")
+        endforeach()
+      endforeach()
+      set(${out} "${refusals}" PARENT_SCOPE)
+    endfunction()
+    
+    # Appends to <out> the refusals of _profile_undone for <base> followed by
+    # <base>_<CONFIG>, for each configuration the build can use, or for <base>
+    # alone when it names none.
+    function(_profile_undone_in required base out)
+      get_property(multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+      if(multi_config)
+        set(configs ${CMAKE_CONFIGURATION_TYPES})
+      else()
+        set(configs ${CMAKE_BUILD_TYPE})
+      endif()
+      set(found "")
+      if(NOT configs)
+        _profile_undone("${required}" "${base}" found)
+      endif()
+      foreach(config IN LISTS configs)
+        string(TOUPPER "${config}" upper)
+        _profile_undone("${required}" "${base};${base}_${upper}" here)
+        if(here)
+          list(APPEND found "${here}")
+        endif()
+      endforeach()
+      list(REMOVE_DUPLICATES found)
+      _profile_untokens("${found}" found)
+      set(all "${${out}}")
+      if(found)
+        list(APPEND all "${found}")
+      endif()
+      set(${out} "${all}" PARENT_SCOPE)
+    endfunction()
     
     """#
   }

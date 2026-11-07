@@ -62,3 +62,6 @@ compilers: Map<axes.Compiler, Compiler> = Map(
 
 /// Compilers of the Clang family, Apple's and the fork included.
 clangFamily: List<axes.Compiler> = compilers.filter((_, c) -> c.id != "GNU").keys.toList()
+
+/// Compilers of the GNU family.
+gnuFamily: List<axes.Compiler> = compilers.filter((_, c) -> c.id == "GNU").keys.toList()

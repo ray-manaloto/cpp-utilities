@@ -79,5 +79,6 @@ staticFiles: Map<String, String> = Map(
   "ProfileCommon.cmake", read("../cmake/ProfileCommon.cmake").text,
   "ProfileToolchain.cmake", read("../cmake/ProfileToolchain.cmake").text,
   "ProfileRules.cmake", read("../cmake/ProfileRules.cmake").text,
-  "ProfileCheck.cmake", read("../cmake/ProfileCheck.cmake").text
+  "ProfileCheck.cmake", read("../cmake/ProfileCheck.cmake").text,
+  "ProfileOverrides.cmake", read("../cmake/ProfileOverrides.cmake").text
 )

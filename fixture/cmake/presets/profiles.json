@@ -20,6 +20,10 @@
       "name": "profile-base",
       "hidden": true,
       "toolchainFile": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+      "environment": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+        "PROFILE_SOURCE_DIR": "${sourceDir}"
+      },
       "cacheVariables": {
         "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/cmake/profile/ProfileRules.cmake",
         "CMAKE_PROJECT_INCLUDE": "${sourceDir}/cmake/profile/ProfileCheck.cmake"
@@ -44,6 +48,9 @@
         "reflection-refl_off",
         "pch-pch_off"
       ],
+      "environment": {
+        "PROFILE_PRESET": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
       }
@@ -67,6 +74,9 @@
         "reflection-refl_off",
         "pch-pch_on"
       ],
+      "environment": {
+        "PROFILE_PRESET": "macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on"
       }
@@ -90,6 +100,9 @@
         "reflection-refl_on",
         "pch-pch_on"
       ],
+      "environment": {
+        "PROFILE_PRESET": "macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on"
       }
@@ -113,6 +126,9 @@
         "reflection-refl_on",
         "pch-pch_off"
       ],
+      "environment": {
+        "PROFILE_PRESET": "macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
       }
@@ -136,6 +152,9 @@
         "reflection-refl_on",
         "pch-pch_off"
       ],
+      "environment": {
+        "PROFILE_PRESET": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
       }
@@ -159,6 +178,9 @@
         "reflection-refl_off",
         "pch-pch_off"
       ],
+      "environment": {
+        "PROFILE_PRESET": "linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
       }
@@ -182,6 +204,9 @@
         "reflection-refl_off",
         "pch-pch_off"
       ],
+      "environment": {
+        "PROFILE_PRESET": "linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      },
       "cacheVariables": {
         "PROFILE_NAME": "linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
       }
