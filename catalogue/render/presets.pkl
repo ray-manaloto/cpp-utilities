@@ -80,7 +80,9 @@ function profilesFile(profiles: List<profile.Profile>, cmakeDir: String): Map<St
     // The environment outlives the cache. A changed compiler makes CMake delete the
     // cache and configure again from the command line alone, so the toolchain file
     // is named here too and finds `PROFILE_PRESET` set where `PROFILE_*` is gone.
-    "environment", Map("CMAKE_TOOLCHAIN_FILE", "\(cmakeDir)/ProfileToolchain.cmake"),
+    // `PROFILE_SOURCE_DIR` ties that to this source tree: a child build that inherits
+    // the environment has another one.
+    "environment", Map("CMAKE_TOOLCHAIN_FILE", "\(cmakeDir)/ProfileToolchain.cmake", "PROFILE_SOURCE_DIR", "${sourceDir}"),
     "cacheVariables", Map(
       "CMAKE_PROJECT_INCLUDE_BEFORE", "\(cmakeDir)/ProfileRules.cmake",
       "CMAKE_PROJECT_INCLUDE", "\(cmakeDir)/ProfileCheck.cmake")

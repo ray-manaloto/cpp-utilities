@@ -84,6 +84,20 @@ else
   failures=$((failures + 1))
 fi
 
+# A child CMake build that inherits the preset's environment (an ExternalProject,
+# a configure test) has another source directory and lost nothing: it is not refused.
+mkdir "$work/child"
+printf 'cmake_minimum_required(VERSION 4.0)\nproject(child LANGUAGES NONE)\n' >"$work/child/CMakeLists.txt"
+n=$((n + 1))
+if env PROFILE_PRESET="$asan" PROFILE_SOURCE_DIR="$PWD" CMAKE_TOOLCHAIN_FILE="$PWD/cmake/profile/ProfileToolchain.cmake" \
+    cmake -G Ninja -S "$work/child" -B "$work/b$n" >"$work/log$n" 2>&1; then
+  echo "ok   $n: accepts a child build that inherits the preset's environment"
+else
+  echo "FAIL $n: configure refused a child build that inherits the preset's environment"
+  sed 's/^/     /' "$work/log$n" | tail -20
+  failures=$((failures + 1))
+fi
+
 # Overrides that keep every flag the profile adds but undo one of them later:
 # in the same variable, in a configuration's variable, or at link time.
 base='-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -march=native'
@@ -110,6 +124,11 @@ expect "CMAKE_CXX_FLAGS_DEBUG has @$work/flags.rsp, a response file the check ca
   -DCMAKE_CXX_FLAGS_DEBUG="-g @$work/flags.rsp"
 expect "CMAKE_EXE_LINKER_FLAGS has --config=$work/x.cfg, a configuration file the check can't read" "$asan" \
   -DCMAKE_EXE_LINKER_FLAGS="--config=$work/x.cfg"
+
+expect 'CMAKE_CXX_FLAGS_DEBUG has -Xclang, a forwarding option the check can' "$asan" \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g -Xclang -disable-llvm-passes"
+expect 'CMAKE_CXX_FLAGS has -Xarch_arm64, a forwarding option the check can' "$asan" \
+  -DCMAKE_CXX_FLAGS="$base -Xarch_arm64 -fno-sanitize=address"
 
 # accept <what> <preset> [cmake args...]: configure must pass.
 accept() {

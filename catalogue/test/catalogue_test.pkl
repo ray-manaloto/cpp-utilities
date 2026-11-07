@@ -139,7 +139,7 @@ facts {
   }
   ["a profile preset keeps its identity and toolchain file in the environment, which a deleted cache leaves"] {
     let (file = presets.profilesFile(valid, "D"))
-      file["configurePresets"].first["environment"] == Map("CMAKE_TOOLCHAIN_FILE", "D/ProfileToolchain.cmake")
+      file["configurePresets"].first["environment"] == Map("CMAKE_TOOLCHAIN_FILE", "D/ProfileToolchain.cmake", "PROFILE_SOURCE_DIR", "${sourceDir}")
       && file["configurePresets"].drop(1).every((c) -> c["environment"] == Map("PROFILE_PRESET", c["name"]))
   }
   ["a triplet hashes the files that build a dependency, not the override check"] {

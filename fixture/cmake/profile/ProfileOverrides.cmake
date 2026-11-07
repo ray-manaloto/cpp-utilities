@@ -61,11 +61,15 @@ endfunction()
 # that undoes one. Reading those files here would mean matching the compilers'
 # quoting, nesting and relative-path rules exactly. -Wl,@<file> is let through:
 # it goes to the linker, which does not read -fsanitize or -fno-sanitize.
+# Forwarding options are refused whole too: -Xclang passes the next argument
+# straight to the compiler front end (as -Xclang -disable-llvm-passes does), and
+# -Xarch_<arch> scopes the next argument to one architecture, so neither can be
+# read as the flag it carries. Any -Xclang or -Xarch_* token is refused, in the
+# base or a configuration's variable.
 # CCC_OVERRIDE_OPTIONS, an environment variable that edits clang's arguments,
-# is a known gap: the check does not see the environment. Another is
-# forwarding options, such as -Xclang -disable-llvm-passes, whose effect on
-# instrumentation is not modelled; -Xarch_<arch> is read as if it did not
-# scope the flag after it.
+# is a known gap: the check does not see the environment. Others are
+# -mllvm <option> and -Xpreprocessor/-Xassembler/-Xlinker, which pass an
+# argument on and are not refused.
 function(_profile_undone required vars out)
   set(refusals "")
   string(ASCII 1 semicolon)
@@ -78,6 +82,8 @@ function(_profile_undone required vars out)
         list(APPEND refusals "${var} has ${token}, a response file the check can't read")
       elseif(token MATCHES "^--config(-system-dir|-user-dir)?(=|$)")
         list(APPEND refusals "${var} has ${token}, a configuration file the check can't read")
+      elseif(token STREQUAL "-Xclang" OR token MATCHES "^-Xarch_")
+        list(APPEND refusals "${var} has ${token}, a forwarding option the check can't read")
       endif()
       list(APPEND tokens_in_order "${token}")
       list(APPEND token_vars "${var}")

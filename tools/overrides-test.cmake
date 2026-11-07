@@ -78,6 +78,22 @@ check("accepts an @ inside a word" "-fsanitize=address"
   "-fsanitize=address -DEMAIL=a@b" "-g -Wl,@/abs/link.rsp -DCONFIG=--config"
   "")
 
+check("refuses -Xclang with its argument" "-fsanitize=address"
+  "-fsanitize=address -Xclang -disable-llvm-passes" "-g"
+  "CMAKE_CXX_FLAGS has -Xclang, a forwarding option the check can't read")
+check("refuses -Xclang in a configuration's variable" "-fsanitize=address"
+  "-fsanitize=address" "-g -Xclang -disable-llvm-passes"
+  "CMAKE_CXX_FLAGS_DEBUG has -Xclang, a forwarding option the check can't read")
+check("refuses -Xarch_<arch> with its argument" "-fsanitize=address"
+  "-fsanitize=address" "-Xarch_arm64 -fno-sanitize=address"
+  "CMAKE_CXX_FLAGS_DEBUG has -Xarch_arm64, a forwarding option the check can't read;CMAKE_CXX_FLAGS_DEBUG turns off sanitizer address, which the profile turns on")
+check("refuses -Xarch_host" "-fsanitize=address"
+  "-fsanitize=address -Xarch_host -g" "-g"
+  "CMAKE_CXX_FLAGS has -Xarch_host, a forwarding option the check can't read")
+check("accepts words that only contain Xclang or Xarch_" "-fsanitize=address"
+  "-fsanitize=address -DXclang -DNO-Xarch_x=1" "-g -DX=-Xclang"
+  "")
+
 if(failures)
   message(FATAL_ERROR "${failures} override check case(s) failed")
 endif()

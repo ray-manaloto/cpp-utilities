@@ -21,7 +21,8 @@
       "hidden": true,
       "toolchainFile": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
       "environment": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/profile/ProfileToolchain.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+        "PROFILE_SOURCE_DIR": "${sourceDir}"
       },
       "cacheVariables": {
         "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/cmake/profile/ProfileRules.cmake",
