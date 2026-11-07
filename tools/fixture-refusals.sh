@@ -98,6 +98,7 @@ accept() {
 }
 
 accept 'turning off a sanitizer the profile lacks' "$asan" -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=leak"
+accept 'a quoted semicolon in a flag' "$asan" -DCMAKE_CXX_FLAGS="$base -DSEP=\"a;b\""
 accept 'turning a profile sanitizer off and on again' "$asan" \
   -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=address -fsanitize=address"
 
