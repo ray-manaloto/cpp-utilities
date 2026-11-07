@@ -1,0 +1,4 @@
+gch-small-vector provides CMake targets:
+
+  find_package(small_vector CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE gch::small_vector)
