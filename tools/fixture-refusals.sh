@@ -1,7 +1,7 @@
 #!/bin/sh
 # Configures the fixture with overrides each profile must refuse, and checks
-# that configure stops with the expected reason. macOS only: the cases name
-# macOS profiles and Homebrew's g++-16.
+# that configure stops with the expected reason, then with overrides it must
+# accept. macOS only: the cases name macOS profiles and Homebrew's g++-16.
 set -eu
 cd "$(dirname "$0")/../fixture"
 work=$(mktemp -d)
@@ -75,6 +75,8 @@ expect 'CMAKE_EXE_LINKER_FLAGS_DEBUG turns off sanitizer address, which the prof
   -DCMAKE_EXE_LINKER_FLAGS_DEBUG=-fno-sanitize=all
 expect 'CMAKE_CXX_FLAGS_RELEASE turns off sanitizer address, which the profile turns on' "$asan" \
   -G "Ninja Multi-Config" -DCMAKE_CXX_FLAGS_RELEASE=-fno-sanitize=address
+expect 'CMAKE_SHARED_LINKER_FLAGS turns off sanitizer undefined, which the profile turns on' "$asan" \
+  -DCMAKE_SHARED_LINKER_FLAGS=-fno-sanitize=undefined
 expect 'CMAKE_C_FLAGS_DEBUG has -fomit-frame-pointer after -fno-omit-frame-pointer, which the profile adds' "$asan" \
   -DCMAKE_C_FLAGS_DEBUG="-g -fomit-frame-pointer"
 expect 'CMAKE_CXX_FLAGS_DEBUG has -march=armv8.5-a after -march=native, which the profile adds' "$asan" \
