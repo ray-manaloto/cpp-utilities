@@ -37,6 +37,21 @@ check("keeps a refused token's semicolon in one refusal" "-march=native"
 check("reads a bare semicolon between sanitizer names as a separator" "-fsanitize=address"
   "-fsanitize=address" "-fno-sanitize=leak;address"
   "CMAKE_CXX_FLAGS_DEBUG turns off sanitizer address, which the profile turns on")
+check("sees a sanitizer override after an unmatched bracket" "-fsanitize=address"
+  "-fsanitize=address -DLBRACKET=[" "-fno-sanitize=all"
+  "CMAKE_CXX_FLAGS_DEBUG turns off sanitizer address, which the profile turns on")
+check("keeps a refused token's bracket in its refusal" "-march=native"
+  "-march=native" "-march=["
+  "CMAKE_CXX_FLAGS_DEBUG has -march=[ after -march=native, which the profile adds")
+check("accepts the level a bare flag means, written out" "${msan}"
+  "-fsanitize=memory -fsanitize-memory-track-origins" "-fsanitize-memory-track-origins=2"
+  "")
+check("refuses a weaker level than a bare flag means" "${msan}"
+  "-fsanitize=memory -fsanitize-memory-track-origins" "-fsanitize-memory-track-origins=1"
+  "CMAKE_CXX_FLAGS_DEBUG has -fsanitize-memory-track-origins=1 after -fsanitize-memory-track-origins, which the profile adds")
+check("refuses -fno-<x> after the written-out level" "${msan}"
+  "-fsanitize=memory -fsanitize-memory-track-origins" "-fsanitize-memory-track-origins=2 -fno-sanitize-memory-track-origins"
+  "CMAKE_CXX_FLAGS_DEBUG has -fno-sanitize-memory-track-origins after -fsanitize-memory-track-origins, which the profile adds")
 
 if(failures)
   message(FATAL_ERROR "${failures} override check case(s) failed")

@@ -81,6 +81,8 @@ expect 'CMAKE_C_FLAGS_DEBUG has -fomit-frame-pointer after -fno-omit-frame-point
   -DCMAKE_C_FLAGS_DEBUG="-g -fomit-frame-pointer"
 expect 'CMAKE_CXX_FLAGS_DEBUG has -march=armv8.5-a after -march=native, which the profile adds' "$asan" \
   -DCMAKE_CXX_FLAGS_DEBUG="-g -march=armv8.5-a"
+expect 'CMAKE_CXX_FLAGS_DEBUG turns off sanitizer address, which the profile turns on' "$asan" \
+  -DCMAKE_CXX_FLAGS="-DLBRACKET=[ $base" -DCMAKE_CXX_FLAGS_DEBUG=-fno-sanitize=all
 
 # accept <what> <preset> [cmake args...]: configure must pass.
 accept() {
@@ -99,6 +101,7 @@ accept() {
 
 accept 'turning off a sanitizer the profile lacks' "$asan" -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=leak"
 accept 'a quoted semicolon in a flag' "$asan" -DCMAKE_CXX_FLAGS="$base -DSEP=\"a;b\""
+accept 'an unmatched bracket in a flag' "$asan" -DCMAKE_CXX_FLAGS="-DLBRACKET=[ $base"
 accept 'turning a profile sanitizer off and on again' "$asan" \
   -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=address -fsanitize=address"
 
