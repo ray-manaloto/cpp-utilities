@@ -64,5 +64,40 @@ expect 'is Clang 21.0.0 commit 0badc0de, but the profile names clangp2996_f17c8d
   -DCMAKE_C_COMPILER="$work/bin/clang-p2996" -DCMAKE_CXX_COMPILER="$work/bin/clang++-p2996"
 expect 'PROFILE_NAME is not set' "$asan" -DPROFILE_NAME=
 
-echo "$((n - failures)) of $n refusal cases passed"
+# Overrides that keep every flag the profile adds but undo one of them later:
+# in the same variable, in a configuration's variable, or at link time.
+base='-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -march=native'
+expect 'CMAKE_CXX_FLAGS turns off sanitizer address, which the profile turns on' "$asan" \
+  -DCMAKE_CXX_FLAGS="$base -fno-sanitize=all"
+expect 'CMAKE_CXX_FLAGS_DEBUG turns off sanitizer undefined, which the profile turns on' "$asan" \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=undefined"
+expect 'CMAKE_EXE_LINKER_FLAGS_DEBUG turns off sanitizer address, which the profile turns on' "$asan" \
+  -DCMAKE_EXE_LINKER_FLAGS_DEBUG=-fno-sanitize=all
+expect 'CMAKE_CXX_FLAGS_RELEASE turns off sanitizer address, which the profile turns on' "$asan" \
+  -G "Ninja Multi-Config" -DCMAKE_CXX_FLAGS_RELEASE=-fno-sanitize=address
+expect 'CMAKE_C_FLAGS_DEBUG has -fomit-frame-pointer after -fno-omit-frame-pointer, which the profile adds' "$asan" \
+  -DCMAKE_C_FLAGS_DEBUG="-g -fomit-frame-pointer"
+expect 'CMAKE_CXX_FLAGS_DEBUG has -march=armv8.5-a after -march=native, which the profile adds' "$asan" \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g -march=armv8.5-a"
+
+# accept <what> <preset> [cmake args...]: configure must pass.
+accept() {
+  what=$1
+  preset=$2
+  shift 2
+  n=$((n + 1))
+  if cmake --preset "$preset" -B "$work/b$n" "$@" >"$work/log$n" 2>&1; then
+    echo "ok   $n: accepts $what"
+  else
+    echo "FAIL $n: configure refused $what"
+    sed 's/^/     /' "$work/log$n" | tail -20
+    failures=$((failures + 1))
+  fi
+}
+
+accept 'turning off a sanitizer the profile lacks' "$asan" -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=leak"
+accept 'turning a profile sanitizer off and on again' "$asan" \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=address -fsanitize=address"
+
+echo "$((n - failures)) of $n cases passed"
 test "$failures" -eq 0
