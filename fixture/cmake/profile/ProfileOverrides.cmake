@@ -61,7 +61,7 @@ endfunction()
 # that undoes one. Reading those files here would mean matching the compilers'
 # quoting, nesting and relative-path rules exactly. -Wl,@<file> is let through:
 # it goes to the linker, which does not read -fsanitize or -fno-sanitize.
-# Forwarding options are refused whole too: -Xclang passes the next argument
+# Forwarding options are refused whole too: -Xclang (also as -Xclang=<argument>) passes the next argument
 # straight to the compiler front end (as -Xclang -disable-llvm-passes does), and
 # -Xarch_<arch> scopes the next argument to one architecture, so neither can be
 # read as the flag it carries. Any -Xclang or -Xarch_* token is refused, in the
@@ -82,7 +82,7 @@ function(_profile_undone required vars out)
         list(APPEND refusals "${var} has ${token}, a response file the check can't read")
       elseif(token MATCHES "^--config(-system-dir|-user-dir)?(=|$)")
         list(APPEND refusals "${var} has ${token}, a configuration file the check can't read")
-      elseif(token STREQUAL "-Xclang" OR token MATCHES "^-Xarch_")
+      elseif(token MATCHES "^-Xclang(=|$)" OR token MATCHES "^-Xarch_")
         list(APPEND refusals "${var} has ${token}, a forwarding option the check can't read")
       endif()
       list(APPEND tokens_in_order "${token}")

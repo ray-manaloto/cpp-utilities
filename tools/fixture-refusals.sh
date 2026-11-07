@@ -87,11 +87,12 @@ fi
 # A child CMake build that inherits the preset's environment (an ExternalProject,
 # a configure test) has another source directory and lost nothing: it is not refused.
 mkdir "$work/child"
-printf 'cmake_minimum_required(VERSION 4.0)\nproject(child LANGUAGES NONE)\n' >"$work/child/CMakeLists.txt"
+printf 'cmake_minimum_required(VERSION 4.0)\nproject(child LANGUAGES CXX)\n' >"$work/child/CMakeLists.txt"
 n=$((n + 1))
 if env PROFILE_PRESET="$asan" PROFILE_SOURCE_DIR="$PWD" CMAKE_TOOLCHAIN_FILE="$PWD/cmake/profile/ProfileToolchain.cmake" \
-    cmake -G Ninja -S "$work/child" -B "$work/b$n" >"$work/log$n" 2>&1; then
-  echo "ok   $n: accepts a child build that inherits the preset's environment"
+    cmake -G Ninja -S "$work/child" -B "$work/b$n" -DCMAKE_CXX_FLAGS_INIT=-DCHILD_KEEPS_ME >"$work/log$n" 2>&1 \
+    && grep -q 'CMAKE_CXX_FLAGS:STRING=.*-DCHILD_KEEPS_ME' "$work/b$n/CMakeCache.txt"; then
+  echo "ok   $n: accepts a child build that inherits the preset's environment, with its own flags"
 else
   echo "FAIL $n: configure refused a child build that inherits the preset's environment"
   sed 's/^/     /' "$work/log$n" | tail -20

@@ -1127,14 +1127,18 @@ examples {
     # PROFILE_SOURCE_DIR limits this to the preset's own source tree: a child build
     # that inherits the environment, such as an ExternalProject or a try_compile
     # project, has another source directory and is left alone.
-    # Known gap: a child build that inherits the environment still loads this
-    # file as its toolchain, with no PROFILE_* set.
+    # Such a child returns at once, so the flags it set for itself stay. Known
+    # gap: a child that configures this same source directory into another build
+    # directory looks like a lost cache and is refused.
     if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER
         AND "${CMAKE_SOURCE_DIR}" STREQUAL "$ENV{PROFILE_SOURCE_DIR}")
       message(FATAL_ERROR "Profile $ENV{PROFILE_PRESET}: the build directory lost the profile. "
         "Changing CMAKE_C_COMPILER or CMAKE_CXX_COMPILER on an existing build directory makes "
         "CMake delete its cache, and the profile's values and checks with it. "
         "Delete the build directory and configure the preset again.")
+    endif()
+    if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER)
+      return()
     endif()
     
     foreach(axis IN LISTS PROFILE_NAME_AXES)
@@ -1518,7 +1522,7 @@ examples {
     # that undoes one. Reading those files here would mean matching the compilers'
     # quoting, nesting and relative-path rules exactly. -Wl,@<file> is let through:
     # it goes to the linker, which does not read -fsanitize or -fno-sanitize.
-    # Forwarding options are refused whole too: -Xclang passes the next argument
+    # Forwarding options are refused whole too: -Xclang (also as -Xclang=<argument>) passes the next argument
     # straight to the compiler front end (as -Xclang -disable-llvm-passes does), and
     # -Xarch_<arch> scopes the next argument to one architecture, so neither can be
     # read as the flag it carries. Any -Xclang or -Xarch_* token is refused, in the
@@ -1539,7 +1543,7 @@ examples {
             list(APPEND refusals "${var} has ${token}, a response file the check can't read")
           elseif(token MATCHES "^--config(-system-dir|-user-dir)?(=|$)")
             list(APPEND refusals "${var} has ${token}, a configuration file the check can't read")
-          elseif(token STREQUAL "-Xclang" OR token MATCHES "^-Xarch_")
+          elseif(token MATCHES "^-Xclang(=|$)" OR token MATCHES "^-Xarch_")
             list(APPEND refusals "${var} has ${token}, a forwarding option the check can't read")
           endif()
           list(APPEND tokens_in_order "${token}")

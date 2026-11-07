@@ -90,6 +90,12 @@ check("refuses -Xarch_<arch> with its argument" "-fsanitize=address"
 check("refuses -Xarch_host" "-fsanitize=address"
   "-fsanitize=address -Xarch_host -g" "-g"
   "CMAKE_CXX_FLAGS has -Xarch_host, a forwarding option the check can't read")
+check("refuses the joined -Xclang=<argument>" "-fsanitize=address"
+  "-fsanitize=address -Xclang=-disable-llvm-passes" "-g"
+  "CMAKE_CXX_FLAGS has -Xclang=-disable-llvm-passes, a forwarding option the check can't read")
+check("refuses the joined -Xclang=<argument> in a configuration's variable" "-fsanitize=address"
+  "-fsanitize=address" "-Xclang=-disable-llvm-passes"
+  "CMAKE_CXX_FLAGS_DEBUG has -Xclang=-disable-llvm-passes, a forwarding option the check can't read")
 check("accepts words that only contain Xclang or Xarch_" "-fsanitize=address"
   "-fsanitize=address -DXclang -DNO-Xarch_x=1" "-g -DX=-Xclang"
   "")
