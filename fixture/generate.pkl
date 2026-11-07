@@ -1,0 +1,31 @@
+/// Emits the catalogue's files for the fixture's profiles, plus the fixture's
+/// own CMakePresets.json: one preset per profile, named `fixture-<profile>`, which sets the
+/// build directory and generator and inherits the hidden Profile preset.
+/// Run from the fixture directory: `pkl eval -m . generate.pkl`.
+module generate
+
+import "@profile-catalogue/catalogue.pkl"
+import "profiles.pkl"
+
+local layout = new catalogue.Layout {}
+local json = new JsonRenderer { indent = "  " }
+local names = profiles.list.map((p) -> p.validated.name)
+
+local solution = Map(
+  "version", 10,
+  "include", List("\(layout.presetsDir)/profiles.json"),
+  "configurePresets", names.map((n) -> Map(
+    "name", "fixture-\(n)", "inherits", List(n),
+    "generator", "Ninja", "binaryDir", "${sourceDir}/build/\(n)")),
+  "buildPresets", names.map((n) -> Map("name", "fixture-\(n)", "configurePreset", "fixture-\(n)")),
+  "testPresets", names.map((n) -> Map("name", "fixture-\(n)", "configurePreset", "fixture-\(n)", "inherits", List(n)))
+)
+
+output {
+  files {
+    for (path, body in catalogue.files(profiles.list, layout)) {
+      [path] { text = body }
+    }
+    ["CMakePresets.json"] { text = json.renderValue(solution) + "\n" }
+  }
+}

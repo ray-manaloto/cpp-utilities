@@ -1,0 +1,145 @@
+{
+  "version": 10,
+  "include": [
+    "cmake/presets/profiles.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "fixture-macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "inherits": [
+        "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    },
+    {
+      "name": "fixture-macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on",
+      "inherits": [
+        "macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on"
+    },
+    {
+      "name": "fixture-macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on",
+      "inherits": [
+        "macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on"
+    },
+    {
+      "name": "fixture-macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "inherits": [
+        "macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+    },
+    {
+      "name": "fixture-linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "inherits": [
+        "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+    },
+    {
+      "name": "fixture-linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "inherits": [
+        "linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    },
+    {
+      "name": "fixture-linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "inherits": [
+        "linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      ],
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "fixture-macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "configurePreset": "fixture-macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    },
+    {
+      "name": "fixture-macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on",
+      "configurePreset": "fixture-macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on"
+    },
+    {
+      "name": "fixture-macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on",
+      "configurePreset": "fixture-macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on"
+    },
+    {
+      "name": "fixture-macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "configurePreset": "fixture-macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+    },
+    {
+      "name": "fixture-linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "configurePreset": "fixture-linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+    },
+    {
+      "name": "fixture-linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "configurePreset": "fixture-linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    },
+    {
+      "name": "fixture-linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "configurePreset": "fixture-linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "fixture-macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "configurePreset": "fixture-macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "inherits": [
+        "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      ]
+    },
+    {
+      "name": "fixture-macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on",
+      "configurePreset": "fixture-macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on",
+      "inherits": [
+        "macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gnu_off-importstd_on-refl_off-pch_on"
+      ]
+    },
+    {
+      "name": "fixture-macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on",
+      "configurePreset": "fixture-macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on",
+      "inherits": [
+        "macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on"
+      ]
+    },
+    {
+      "name": "fixture-macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "configurePreset": "fixture-macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "inherits": [
+        "macos-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+      ]
+    },
+    {
+      "name": "fixture-linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "configurePreset": "fixture-linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+      "inherits": [
+        "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+      ]
+    },
+    {
+      "name": "fixture-linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "configurePreset": "fixture-linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "inherits": [
+        "linux-gcc14_2_0-release-ipo_off-none-none-znver2-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      ]
+    },
+    {
+      "name": "fixture-linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "configurePreset": "fixture-linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+      "inherits": [
+        "linux-clang23_1_4-release-ipo_off-tsan-none-noavx-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+      ]
+    }
+  ]
+}

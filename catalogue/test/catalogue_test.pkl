@@ -1,0 +1,139 @@
+/// Facts about the catalogue's tables and rules, and golden examples of its
+/// rendered files. Run `pkl test test/catalogue_test.pkl` in the catalogue
+/// directory; `--overwrite` rewrites the expected files after a reviewed change.
+amends "pkl:test"
+
+import "pkl:test"
+import "../axes.pkl"
+import "../catalogue.pkl"
+import "../compilers.pkl"
+import "../profile.pkl"
+import "../rules.pkl"
+import "../settings.pkl"
+
+local function mac(c: axes.Compiler): profile.Profile = new { system = "macos"; compiler = c }
+local function linux(c: axes.Compiler): profile.Profile = new { system = "linux"; compiler = c }
+
+/// One profile per rule that breaks that rule; the facts check it is refused.
+local witnesses: Map<String, profile.Profile> = Map(
+  "compiler_system_gcc14_2_0", mac("gcc14_2_0"),
+  "compiler_system_appleclang21_0_0", linux("appleclang21_0_0"),
+  "sanitizer_tsan_asan", (linux("clang23_1_4")) { sanitizers = Set("tsan", "asan") },
+  "sanitizer_tsan_msan", (linux("clang23_1_4")) { sanitizers = Set("tsan", "msan") },
+  "sanitizer_msan_asan", (linux("clang23_1_4")) { sanitizers = Set("msan", "asan") },
+  "sanitizer_hwasan_asan", (linux("clang23_1_4")) { arch = "arm64"; targetCpu = "arm64"; sanitizers = Set("hwasan", "asan") },
+  "sanitizer_clang", (linux("gcc16_2_0")) { sanitizers = Set("rtsan") },
+  "sanitizer_hwasan_arch", (linux("clang23_1_4")) { sanitizers = Set("hwasan") },
+  "sanitizer_nsan_arch", (linux("clang23_1_4")) { arch = "arm64"; targetCpu = "arm64"; sanitizers = Set("nsan") },
+  "sanitizer_macos", (mac("clang23_1_4")) { sanitizers = Set("asan") },
+  "xray_clang", (linux("gcc16_2_0")) { instrumentation = "xray" },
+  "xray_macos", (mac("clang23_1_4")) { instrumentation = "xray" },
+  "bolt_macos", (mac("clang23_1_4")) { instrumentation = "bolt" },
+  "cpu_arm64", (mac("clang23_1_4")) { targetCpu = "znver2" },
+  "cpu_amd64", (linux("clang23_1_4")) { targetCpu = "arm64" },
+  "reflection_standard", (linux("gcc16_2_0")) { reflection = "refl_on" },
+  "reflection_compiler", (linux("clang23_1_4")) { reflection = "refl_on"; cxxStandard = "cxx26" },
+  "importstd_compiler", (linux("gcc14_2_0")) { importStd = "importstd_on" },
+  "importstd_generator", (linux("clang23_1_4")) { importStd = "importstd_on"; generator = "unix_makefiles" },
+  "importstd_standard", (linux("clang23_1_4")) { importStd = "importstd_on"; cxxStandard = "cxx20" },
+  "pch_sccache", (linux("gcc16_2_0")) { pch = "pch_on"; launcher = "sccache" }
+)
+
+local function refusedIds(p: profile.Profile): List<String> = p.refusals.map((r) -> r.split(":").first)
+
+/// Profiles the catalogue must accept, one per supported feature.
+local valid: List<profile.Profile> = List(
+  (mac("clang23_1_4")) { buildType = "debug"; sanitizers = Set("ubsan", "asan") },
+  (mac("clang23_1_4")) { ipo = "ipo_on"; importStd = "importstd_on"; pch = "pch_on" },
+  (mac("gcc16_2_0")) { cxxStandard = "cxx26"; reflection = "refl_on"; pch = "pch_on" },
+  (mac("clangp2996_f17c8d6c")) { cxxStandard = "cxx26"; reflection = "refl_on" },
+  (mac("appleclang21_0_0")) { sanitizers = Set("ubsan") },
+  (linux("clangp2996_f17c8d6c")) { cxxStandard = "cxx26"; reflection = "refl_on"; launcher = "sccache" },
+  (linux("gcc14_2_0")) { targetCpu = "znver2" },
+  (linux("gcc16_2_0")) { importStd = "importstd_on"; pch = "pch_on"; launcher = "ccache" },
+  (linux("clang23_1_4")) { sanitizers = Set("tsan"); targetCpu = "noavx" },
+  (linux("clang23_1_4")) { sanitizers = Set("msan"); instrumentation = "xray" },
+  (linux("clang23_1_4")) { arch = "arm64"; targetCpu = "arm64"; sanitizers = Set("hwasan") },
+  (linux("clang23_1_4")) { sanitizers = Set("nsan", "rtsan", "tysan"); instrumentation = "bolt" }
+)
+
+local allAxes: List<String> = axes.nameAxes + axes.contextAxes
+
+facts {
+  ["every axis list is distinct and every axis has values"] {
+    axes.axisValues.values.every((vs) -> vs.isDistinct && !vs.isEmpty)
+    axes.sanitizers.isDistinct
+    axes.axisValues.keys == (allAxes.filter((a) -> a != "sanitizer")).toSet()
+  }
+  ["the enums reject values outside the axis"] {
+    !("clang99_0_0" is axes.Compiler)
+    !("haswell" is axes.TargetCpu)
+    !("cxx17" is axes.CxxStandard)
+    !("coverage" is axes.Instrumentation)
+    "clangp2996_f17c8d6c" is axes.Compiler
+  }
+  ["each compiler's axis value spells its identity"] {
+    compilers.compilers.keys.every((k) -> compilers.compilers[k].value == k)
+    compilers.compilers.keys == axes.compilers.toSet()
+  }
+  ["every rule names known axes and values"] {
+    rules.rules.every((r) -> r.conditions.every((c) ->
+      if (c.axis == "sanitizers") c.values.every((v) -> axes.sanitizers.contains(v))
+      else if (c.axis == "sanitizer") c.values.every((v) -> v == "none" || v.split("_").every((m) -> axes.sanitizers.contains(m)))
+      else allAxes.contains(c.axis) && c.values.every((v) -> axes.axisValues[c.axis].contains(v))))
+    rules.rules.map((r) -> r.id).isDistinct
+  }
+  ["every rule has a witness, and refuses it"] {
+    rules.rules.map((r) -> r.id).toSet() == witnesses.keys
+    witnesses.keys.every((id) -> refusedIds(witnesses[id]).contains(id))
+  }
+  ["the supported profiles are accepted"] {
+    valid.every((p) -> p.refusals.isEmpty)
+  }
+  ["clang-p2996 is listed and accepted on linux as well as macos"] {
+    compilers.compilers["clangp2996_f17c8d6c"].cxx.keys == Set("macos", "linux")
+    (linux("clangp2996_f17c8d6c")) { cxxStandard = "cxx26"; reflection = "refl_on" }.refusals.isEmpty
+  }
+  ["reflection belongs to the compilers whose flag rows add it"] {
+    settings.reflectionCompilers == List("gcc16_2_0", "clangp2996_f17c8d6c")
+  }
+  ["a name spells every name axis, defaults included, with sanitizers in axis order"] {
+    (mac("clang23_1_4")) { sanitizers = Set("ubsan", "asan") }.name
+      == "macos-clang23_1_4-release-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+    linux("gcc16_2_0").arch == "amd64" && mac("gcc16_2_0").arch == "arm64"
+    linux("gcc16_2_0").name.split("-").length == axes.nameAxes.length
+  }
+  ["context axes change the rules but not the name"] {
+    (linux("gcc16_2_0")) { launcher = "sccache"; generator = "unix_makefiles" }.name == linux("gcc16_2_0").name
+  }
+  ["a refused profile throws every refusal"] {
+    let (msg = test.catch(() -> (mac("gcc14_2_0")) { instrumentation = "bolt"; sanitizers = Set("tsan") }.validated))
+      msg.contains("compiler_system_gcc14_2_0") && msg.contains("bolt_macos") && msg.contains("sanitizer_macos")
+  }
+  ["files refuses invalid profiles and duplicate names"] {
+    test.catch(() -> catalogue.files(List(mac("gcc14_2_0")), new catalogue.Layout {})).contains("compiler_system_gcc14_2_0")
+    test.catch(() -> catalogue.files(List(linux("gcc16_2_0"), (linux("gcc16_2_0")) { launcher = "ccache" }), new catalogue.Layout {}))
+      .contains("duplicate profile names: linux-gcc16_2_0-")
+  }
+  ["files emits every shard, the CMake files and a triplet per profile"] {
+    let (emitted = catalogue.files(valid, new catalogue.Layout {}))
+      emitted.keys.filter((k) -> k.startsWith("cmake/presets/")).length == axes.nameAxes.length + 1
+      && emitted.keys.filter((k) -> k.startsWith("cmake/profile/triplets/")).length == valid.length
+      && emitted.containsKey("cmake/profile/ProfileRules.cmake")
+      && emitted.containsKey("cmake/profile/ProfileCheck.cmake")
+      && emitted.containsKey("cmake/profile/ProfileToolchain.cmake")
+      && emitted.containsKey("cmake/profile/ProfileCommon.cmake")
+      && emitted.containsKey("cmake/profile/profile-data.cmake")
+  }
+}
+
+local golden = catalogue.files(List(
+  (mac("clang23_1_4")) { buildType = "debug"; sanitizers = Set("ubsan", "asan") },
+  (linux("clangp2996_f17c8d6c")) { cxxStandard = "cxx26"; reflection = "refl_on" }
+), new catalogue.Layout {})
+
+examples {
+  for (path, body in golden) {
+    [path] { body }
+  }
+}

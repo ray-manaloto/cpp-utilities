@@ -1,0 +1,21 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "pch-pch_on",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_PCH": "pch_on",
+        "CMAKE_DISABLE_PRECOMPILE_HEADERS": "OFF"
+      }
+    },
+    {
+      "name": "pch-pch_off",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_PCH": "pch_off",
+        "CMAKE_DISABLE_PRECOMPILE_HEADERS": "ON"
+      }
+    }
+  ]
+}

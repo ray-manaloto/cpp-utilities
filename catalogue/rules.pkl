@@ -1,0 +1,75 @@
+/// The rules that refuse invalid combinations, as data. Pkl evaluates them
+/// on a profile, and the check module evaluates the same rows at configure
+/// time, with arch, generator and launcher read from CMake.
+module rules
+
+import "axes.pkl"
+import "compilers.pkl"
+import "settings.pkl"
+
+/// Holds when the axis value is one of `values`, or, `negated`, when it is none
+/// of them. Axis `sanitizers` matches when the set holds any of `values`.
+class Condition {
+  axis: String
+  values: List<String>
+  negated: Boolean = false
+}
+
+/// Refuses a profile when every condition holds.
+class Rule {
+  id: String(matches(Regex("[a-z0-9_]+")))
+  message: String
+  conditions: List<Condition>
+}
+
+local function oneOf(axisId: String, members: List<String>): Condition = new { axis = axisId; values = members }
+local function noneOf(axisId: String, members: List<String>): Condition = new { axis = axisId; values = members; negated = true }
+local function rule(ruleId: String, text: String, all: List<Condition>): Rule = new { id = ruleId; message = text; conditions = all }
+
+local compilerSystemRules: List<Rule> =
+  compilers.compilers.keys.toList()
+    .filter((k) -> compilers.compilers[k].cxx.length < axes.systems.length)
+    .map((k) ->
+      let (systems = compilers.compilers[k].cxx.keys.toList())
+        rule("compiler_system_\(k)", "\(k) runs on \(systems.join(" and ")) only", List(
+          oneOf("compiler", List(k)), noneOf("system", systems))))
+
+local clangOnly: List<String> = compilers.clangFamily
+
+rules: List<Rule> = compilerSystemRules + List(
+  // Sanitizers that cannot share a process.
+  rule("sanitizer_tsan_asan", "tsan excludes asan", List(oneOf("sanitizers", List("tsan")), oneOf("sanitizers", List("asan")))),
+  rule("sanitizer_tsan_msan", "tsan excludes msan", List(oneOf("sanitizers", List("tsan")), oneOf("sanitizers", List("msan")))),
+  rule("sanitizer_msan_asan", "msan excludes asan", List(oneOf("sanitizers", List("msan")), oneOf("sanitizers", List("asan")))),
+  rule("sanitizer_hwasan_asan", "hwasan excludes asan", List(oneOf("sanitizers", List("hwasan")), oneOf("sanitizers", List("asan")))),
+  rule("sanitizer_clang", "msan, rtsan, tysan and nsan need a clang compiler", List(
+    oneOf("sanitizers", List("msan", "rtsan", "tysan", "nsan")), noneOf("compiler", clangOnly))),
+  rule("sanitizer_hwasan_arch", "hwasan needs arm64", List(oneOf("sanitizers", List("hwasan")), noneOf("arch", List("arm64")))),
+  rule("sanitizer_nsan_arch", "nsan needs amd64", List(oneOf("sanitizers", List("nsan")), noneOf("arch", List("amd64")))),
+  // macOS runs only ubsan, and asan with ubsan; the rest run on Linux.
+  rule("sanitizer_macos", "macos allows only the sanitizers ubsan, and asan with ubsan", List(
+    oneOf("system", List("macos")), noneOf("sanitizer", List("none", "ubsan", "asan_ubsan")))),
+
+  // Instrumentation.
+  rule("xray_clang", "xray needs a clang compiler", List(oneOf("instrumentation", List("xray")), noneOf("compiler", clangOnly))),
+  rule("xray_macos", "xray has no runtime on macos", List(oneOf("instrumentation", List("xray")), oneOf("system", List("macos")))),
+  rule("bolt_macos", "bolt rewrites ELF binaries and runs on linux only", List(oneOf("instrumentation", List("bolt")), oneOf("system", List("macos")))),
+
+  // Target CPU against architecture.
+  rule("cpu_arm64", "arm64 excludes the znver2 and noavx pins", List(oneOf("arch", List("arm64")), oneOf("target_cpu", List("znver2", "noavx")))),
+  rule("cpu_amd64", "amd64 excludes the arm64 pin", List(oneOf("arch", List("amd64")), oneOf("target_cpu", List("arm64")))),
+
+  // Language levels.
+  rule("reflection_standard", "reflection needs cxx26", List(oneOf("reflection", List("refl_on")), noneOf("cxx_standard", List("cxx26")))),
+  rule("reflection_compiler", "reflection needs \(settings.reflectionCompilers.join(" or "))", List(
+    oneOf("reflection", List("refl_on")), noneOf("compiler", settings.reflectionCompilers))),
+  rule("importstd_compiler", "import std is refused on appleclang21_0_0 and gcc14_2_0", List(
+    oneOf("import_std", List("importstd_on")), oneOf("compiler", List("appleclang21_0_0", "gcc14_2_0")))),
+  rule("importstd_generator", "import std needs a Ninja generator", List(
+    oneOf("import_std", List("importstd_on")), noneOf("generator", List("ninja", "ninja_multi_config")))),
+  rule("importstd_standard", "import std needs cxx23 or later", List(oneOf("import_std", List("importstd_on")), oneOf("cxx_standard", List("cxx20")))),
+
+  // Precompiled headers.
+  rule("pch_sccache", "pch is refused on gcc16_2_0 under sccache", List(
+    oneOf("pch", List("pch_on")), oneOf("compiler", List("gcc16_2_0")), oneOf("launcher", List("sccache"))))
+)

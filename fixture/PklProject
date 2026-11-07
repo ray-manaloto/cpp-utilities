@@ -1,0 +1,7 @@
+amends "pkl:Project"
+
+// The fixture uses the catalogue as a local project dependency, the way a
+// consumer uses the published package: through `@profile-catalogue/`.
+dependencies {
+  ["profile-catalogue"] = import("../catalogue/PklProject")
+}

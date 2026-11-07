@@ -1,0 +1,40 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "compiler-clang23_1_4",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "clang23_1_4"
+      }
+    },
+    {
+      "name": "compiler-gcc16_2_0",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "gcc16_2_0"
+      }
+    },
+    {
+      "name": "compiler-gcc14_2_0",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "gcc14_2_0"
+      }
+    },
+    {
+      "name": "compiler-appleclang21_0_0",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "appleclang21_0_0"
+      }
+    },
+    {
+      "name": "compiler-clangp2996_f17c8d6c",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "clangp2996_f17c8d6c"
+      }
+    }
+  ]
+}

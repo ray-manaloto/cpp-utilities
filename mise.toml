@@ -1,0 +1,39 @@
+# Tools for the catalogue's own tests and the generic fixture.
+# Compilers are not pinned here: on macOS the fixture uses the machine's
+# clang 23.1.4 and gcc-16 16.2.0 from PATH, and the profile check module
+# refuses a configure whose compiler version does not match the profile.
+[tools]
+pkl = "0.33.0"
+cmake = "4.4.5"
+ninja = "1.13.2"
+"pipx:check-jsonschema" = "0.38.2"
+
+[tasks.test]
+description = "Run the catalogue's pkl tests"
+dir = "catalogue"
+run = "pkl test test/catalogue_test.pkl"
+
+[tasks."fixture:generate"]
+description = "Regenerate the fixture's presets, toolchain, check module and triplets"
+dir = "fixture"
+run = "pkl eval -m . generate.pkl"
+
+[tasks."fixture:fresh"]
+description = "Fail if the committed generated fixture files are stale"
+run = "tools/fixture-fresh.sh"
+
+[tasks."fixture:schema"]
+description = "Validate the generated presets against CMake's presets schema"
+run = "tools/fixture-schema.sh"
+
+[tasks."fixture:build"]
+description = "Configure, build and test every fixture preset for this machine"
+run = "tools/fixture-build.sh"
+
+[tasks."fixture:refusals"]
+description = "Check configure refuses ruled overrides (macOS)"
+run = "tools/fixture-refusals.sh"
+
+[tasks.check]
+description = "Run every check"
+depends = ["test", "fixture:fresh", "fixture:schema", "fixture:build", "fixture:refusals"]

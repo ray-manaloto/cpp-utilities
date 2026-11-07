@@ -1,0 +1,92 @@
+/// Every axis of a build profile, as a closed set of values.
+///
+/// Pkl has no enum keyword; a union of string literals is its enum, and the
+/// list beside each one holds the same members so tests can prove they agree.
+module axes
+
+/// Operating system.
+typealias System = "macos"|"linux"
+systems: List<System> = List("macos", "linux")
+
+/// CPU architecture of the machine the code runs on. Context for the rules, not a name segment.
+typealias Arch = "amd64"|"arm64"
+archs: List<Arch> = List("amd64", "arm64")
+
+/// Compiler. The value carries the upstream version, with `_` for dots;
+/// `clangp2996` carries the first eight hex digits of the fork commit instead.
+typealias Compiler = "clang23_1_4"|"gcc16_2_0"|"gcc14_2_0"|"appleclang21_0_0"|"clangp2996_f17c8d6c"
+compilers: List<Compiler> = List("clang23_1_4", "gcc16_2_0", "gcc14_2_0", "appleclang21_0_0", "clangp2996_f17c8d6c")
+
+typealias BuildType = "debug"|"release"|"relwithdebinfo"|"minsizerel"
+buildTypes: List<BuildType> = List("debug", "release", "relwithdebinfo", "minsizerel")
+
+typealias Ipo = "ipo_on"|"ipo_off"
+ipos: List<Ipo> = List("ipo_on", "ipo_off")
+
+/// One sanitizer. A profile holds a set of these.
+typealias Sanitizer = "asan"|"ubsan"|"lsan"|"tsan"|"msan"|"hwasan"|"rtsan"|"tysan"|"nsan"
+sanitizers: List<Sanitizer> = List("asan", "ubsan", "lsan", "tsan", "msan", "hwasan", "rtsan", "tysan", "nsan")
+
+/// `bolt` links with relocations kept so llvm-bolt can rewrite the binary.
+typealias Instrumentation = "none"|"xray"|"bolt"
+instrumentations: List<Instrumentation> = List("none", "xray", "bolt")
+
+/// `native` is the host's own CPU; `znver2` and `noavx` (x86-64-v2, no AVX) pin x86-64 code;
+/// `arm64` pins the generic Arm 64-bit baseline.
+typealias TargetCpu = "native"|"znver2"|"noavx"|"arm64"
+targetCpus: List<TargetCpu> = List("native", "znver2", "noavx", "arm64")
+
+typealias CxxStandard = "cxx20"|"cxx23"|"cxx26"
+cxxStandards: List<CxxStandard> = List("cxx20", "cxx23", "cxx26")
+
+typealias CStandard = "c17"|"c23"
+cStandards: List<CStandard> = List("c17", "c23")
+
+typealias GnuExtensions = "gnu_on"|"gnu_off"
+gnuExtensions: List<GnuExtensions> = List("gnu_on", "gnu_off")
+
+typealias ImportStd = "importstd_on"|"importstd_off"
+importStds: List<ImportStd> = List("importstd_on", "importstd_off")
+
+typealias Reflection = "refl_on"|"refl_off"
+reflections: List<Reflection> = List("refl_on", "refl_off")
+
+typealias Pch = "pch_on"|"pch_off"
+pchs: List<Pch> = List("pch_on", "pch_off")
+
+/// CMake generator. Context for the rules, not a name segment.
+typealias Generator = "ninja"|"ninja_multi_config"|"unix_makefiles"|"xcode"
+generators: List<Generator> = List("ninja", "ninja_multi_config", "unix_makefiles", "xcode")
+
+/// Compiler launcher. Context for the rules, not a name segment.
+typealias Launcher = "none"|"ccache"|"sccache"
+launchers: List<Launcher> = List("none", "ccache", "sccache")
+
+/// The axes a profile name spells, in name order. `sanitizer` is the set of
+/// sanitizers spelled as one value; every other axis holds one value.
+nameAxes: List<String> = List(
+  "system", "compiler", "build_type", "ipo", "sanitizer", "instrumentation", "target_cpu",
+  "cxx_standard", "c_standard", "gnu_extensions", "import_std", "reflection", "pch"
+)
+
+/// Axes the rules read but a name leaves out. CMake derives them at configure time.
+contextAxes: List<String> = List("arch", "generator", "launcher")
+
+/// The values of every single-valued axis, keyed by axis id.
+axisValues: Map<String, List<String>> = Map(
+  "system", systems,
+  "compiler", compilers,
+  "build_type", buildTypes,
+  "ipo", ipos,
+  "instrumentation", instrumentations,
+  "target_cpu", targetCpus,
+  "cxx_standard", cxxStandards,
+  "c_standard", cStandards,
+  "gnu_extensions", gnuExtensions,
+  "import_std", importStds,
+  "reflection", reflections,
+  "pch", pchs,
+  "arch", archs,
+  "generator", generators,
+  "launcher", launchers
+)

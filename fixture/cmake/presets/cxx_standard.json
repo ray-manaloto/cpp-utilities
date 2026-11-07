@@ -1,0 +1,32 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "cxx_standard-cxx20",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_CXX_STANDARD": "cxx20",
+        "CMAKE_CXX_STANDARD": "20",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+      }
+    },
+    {
+      "name": "cxx_standard-cxx23",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_CXX_STANDARD": "cxx23",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+      }
+    },
+    {
+      "name": "cxx_standard-cxx26",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_CXX_STANDARD": "cxx26",
+        "CMAKE_CXX_STANDARD": "26",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+      }
+    }
+  ]
+}

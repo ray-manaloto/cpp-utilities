@@ -1,0 +1,38 @@
+/// The catalogue's entry point: every file it emits for a list of profiles.
+///
+/// ```
+/// import "@profile-catalogue/catalogue.pkl"
+/// output { files { for (path, body in catalogue.files(myProfiles, new catalogue.Layout {})) { [path] { text = body } } } }
+/// ```
+module catalogue
+
+import "profile.pkl"
+import "render/cmake.pkl"
+import "render/presets.pkl"
+import "render/triplets.pkl"
+import "axes.pkl"
+
+/// Where the emitted files go.
+class Layout {
+  /// Output directory of the preset shards.
+  presetsDir: String = "cmake/presets"
+  /// Output directory of the toolchain file, check module and their includes.
+  cmakeDir: String = "cmake/profile"
+  /// `cmakeDir` as a preset sees it.
+  cmakeDirInPresets: String = "${sourceDir}/\(cmakeDir)"
+}
+
+local json = new JsonRenderer { indent = "  " }
+
+/// Every emitted file's text, by output path. Throws when a profile is refused
+/// or two profiles share a name.
+function files(profiles: List<profile.Profile>, layout: Layout): Map<String, String> =
+  let (valid = profiles.map((p) -> p.validated))
+    let (dup = valid.map((p) -> p.name).filter((n) -> valid.count((p) -> p.name == n) > 1).distinct)
+      if (!dup.isEmpty) throw("duplicate profile names: " + dup.join(", "))
+      else
+        axes.nameAxes.toMap((a) -> "\(layout.presetsDir)/\(a).json", (a) -> json.renderValue(presets.axisFile(a, valid)) + "\n")
+        + Map("\(layout.presetsDir)/profiles.json", json.renderValue(presets.profilesFile(valid, layout.cmakeDirInPresets)) + "\n")
+        + Map("\(layout.cmakeDir)/profile-data.cmake", cmake.data)
+        + cmake.staticFiles.keys.toList().toMap((k) -> "\(layout.cmakeDir)/\(k)", (k) -> cmake.staticFiles[k])
+        + valid.toMap((p) -> "\(layout.cmakeDir)/triplets/\(triplets.name(p)).cmake", (p) -> triplets.text(p))

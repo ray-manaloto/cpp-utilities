@@ -1,0 +1,94 @@
+/// Renders the CMake preset shards: one file of hidden presets per name axis,
+/// and `profiles.json`, which includes them all and holds one hidden preset
+/// per profile.
+module presets
+
+import "../axes.pkl"
+import "../profile.pkl"
+import "../settings.pkl"
+
+/// CMake presets schema version. CMake 4.4 reads up to 12; nothing here needs more than 10.
+presetVersion: Int = 10
+
+/// The cache variable an axis sets: `PROFILE_` and the axis id in capitals.
+function variable(axis: String): String = "PROFILE_\(axis.toUpperCase())"
+
+/// The hidden preset name for one axis value.
+function axisPreset(axis: String, value: String): String = "\(axis)-\(value)"
+
+local hostSystemNames: Map<String, String> = Map("macos", "Darwin", "linux", "Linux")
+
+local function nativeSettings(axis: String, value: String): Map<String, String> =
+  settings.cacheVariables.getOrNull(axis)?.getOrNull(value) ?? Map()
+
+local function axisConfigure(axis: String, value: String): Map<String, Any> =
+  let (base = Map(
+    "name", axisPreset(axis, value),
+    "hidden", true,
+    "cacheVariables", Map(variable(axis), value) + nativeSettings(axis, value)
+  ))
+    if (axis == "system")
+      base + Map("condition", Map("type", "equals", "lhs", "${hostSystemName}", "rhs", hostSystemNames[value]))
+    else base
+
+/// The sanitizer values a set of profiles needs: `none`, every single sanitizer,
+/// then each combination the profiles use, sorted.
+function sanitizerValues(profiles: List<profile.Profile>): List<String> =
+  let (singles = List("none") + axes.sanitizers)
+    singles + profiles.map((p) -> p.sanitizer).filter((v) -> !singles.contains(v)).distinct.sort()
+
+local sanitizerEnvironment: Map<String, Map<String, String>> = Map(
+  "asan", Map("ASAN_OPTIONS", "halt_on_error=1:abort_on_error=1"),
+  "ubsan", Map("UBSAN_OPTIONS", "halt_on_error=1:print_stacktrace=1"),
+  "lsan", Map("LSAN_OPTIONS", "exitcode=23"),
+  "tsan", Map("TSAN_OPTIONS", "halt_on_error=1"),
+  "msan", Map("MSAN_OPTIONS", "halt_on_error=1"),
+  "hwasan", Map("HWASAN_OPTIONS", "halt_on_error=1")
+)
+
+/// The test preset every profile's tests inherit: no tests is an error.
+testBase: String = "profile-test-base"
+
+local function sanitizerTest(value: String): Map<String, Any> =
+  let (env = value.split("_").fold(Map(), (acc: Map<String, String>, m) -> acc + (sanitizerEnvironment.getOrNull(m) ?? Map())))
+    Map("name", axisPreset("sanitizer", value), "hidden", true, "inherits", List(testBase))
+      + (if (env.isEmpty) Map() else Map("environment", env))
+
+/// One axis file's JSON value.
+function axisFile(axis: String, profiles: List<profile.Profile>): Map<String, Any> =
+  let (values = if (axis == "sanitizer") sanitizerValues(profiles) else axes.axisValues[axis])
+    Map("version", presetVersion, "configurePresets", values.map((v) -> axisConfigure(axis, v)))
+      + (if (axis != "sanitizer") Map() else Map("testPresets", List(
+          Map("name", testBase, "hidden", true,
+            "output", Map("outputOnFailure", true),
+            "execution", Map("noTestsAction", "error"))
+        ) + values.map((v) -> sanitizerTest(v))))
+
+/// The base every Profile preset inherits: the toolchain file, the rules
+/// module before project() and the check module after it.
+profileBase: String = "profile-base"
+
+/// `profiles.json`'s JSON value. `cmakeDir` is the emitted CMake directory as a
+/// preset sees it, such as `${sourceDir}/cmake/profile`.
+function profilesFile(profiles: List<profile.Profile>, cmakeDir: String): Map<String, Any> = Map(
+  "version", presetVersion,
+  "include", axes.nameAxes.map((a) -> "\(a).json"),
+  "configurePresets", List(Map(
+    "name", profileBase,
+    "hidden", true,
+    "toolchainFile", "\(cmakeDir)/ProfileToolchain.cmake",
+    "cacheVariables", Map(
+      "CMAKE_PROJECT_INCLUDE_BEFORE", "\(cmakeDir)/ProfileRules.cmake",
+      "CMAKE_PROJECT_INCLUDE", "\(cmakeDir)/ProfileCheck.cmake")
+  )) + profiles.map((p) -> Map(
+    "name", p.name,
+    "hidden", true,
+    "inherits", List(profileBase) + axes.nameAxes.map((a) -> axisPreset(a, p.values[a])),
+    "cacheVariables", Map("PROFILE_NAME", p.name)
+  )),
+  "testPresets", profiles.map((p) -> Map(
+    "name", p.name,
+    "hidden", true,
+    "inherits", List(axisPreset("sanitizer", p.sanitizer))
+  ))
+)

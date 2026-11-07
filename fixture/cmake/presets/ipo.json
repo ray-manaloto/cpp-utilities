@@ -1,0 +1,21 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "ipo-ipo_on",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_IPO": "ipo_on",
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON"
+      }
+    },
+    {
+      "name": "ipo-ipo_off",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_IPO": "ipo_off",
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "OFF"
+      }
+    }
+  ]
+}

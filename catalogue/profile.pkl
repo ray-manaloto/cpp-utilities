@@ -1,0 +1,74 @@
+/// A build profile: one value on every axis, its canonical name, and the
+/// rules it breaks.
+module profile
+
+import "axes.pkl"
+import "rules.pkl"
+
+/// One build profile.
+///
+/// `arch`, `generator` and `launcher` are context the rules need. They are
+/// not part of the name, and CMake reads them from the build at configure time.
+class Profile {
+  system: axes.System
+  arch: axes.Arch = if (system == "macos") "arm64" else "amd64"
+  compiler: axes.Compiler
+  buildType: axes.BuildType = "release"
+  ipo: axes.Ipo = "ipo_off"
+  sanitizers: Set<axes.Sanitizer> = Set()
+  instrumentation: axes.Instrumentation = "none"
+  targetCpu: axes.TargetCpu = "native"
+  cxxStandard: axes.CxxStandard = "cxx23"
+  cStandard: axes.CStandard = "c17"
+  gnuExtensions: axes.GnuExtensions = "gnu_off"
+  importStd: axes.ImportStd = "importstd_off"
+  reflection: axes.Reflection = "refl_off"
+  pch: axes.Pch = "pch_off"
+  generator: axes.Generator = "ninja"
+  launcher: axes.Launcher = "none"
+
+  /// The sanitizer axis as one value: `none`, or the members in axis order joined with `_`.
+  sanitizer: String =
+    let (chosen = axes.sanitizers.filter((s) -> sanitizers.contains(s)))
+      if (chosen.isEmpty) "none" else chosen.join("_")
+
+  /// Every axis value, keyed by axis id: the name axes, then the context axes.
+  values: Map<String, String> = Map(
+    "system", system,
+    "compiler", compiler,
+    "build_type", buildType,
+    "ipo", ipo,
+    "sanitizer", sanitizer,
+    "instrumentation", instrumentation,
+    "target_cpu", targetCpu,
+    "cxx_standard", cxxStandard,
+    "c_standard", cStandard,
+    "gnu_extensions", gnuExtensions,
+    "import_std", importStd,
+    "reflection", reflection,
+    "pch", pch,
+    "arch", arch,
+    "generator", generator,
+    "launcher", launcher
+  )
+
+  /// The canonical name: every name axis value, defaults included, in name order, joined with `-`.
+  name: String = axes.nameAxes.map((a) -> values[a]).join("-")
+
+  /// Every rule this profile breaks, as `<rule id>: <message>`. Empty when the profile is valid.
+  refusals: List<String> =
+    rules.rules
+      .filter((r) -> r.conditions.every((c) -> holds(c)))
+      .map((r) -> "\(r.id): \(r.message)")
+
+  /// The profile itself when it is valid; evaluating it otherwise throws every refusal.
+  validated: Profile =
+    if (refusals.isEmpty) this
+    else throw("profile \(name) refused:\n  " + refusals.join("\n  "))
+
+  /// Whether one rule condition holds on this profile.
+  function holds(c: rules.Condition): Boolean =
+    let (actual = if (c.axis == "sanitizers") sanitizers else Set(values[c.axis]))
+      let (hit = !actual.intersect(c.values.toSet()).isEmpty)
+        if (c.negated) !hit else hit
+}

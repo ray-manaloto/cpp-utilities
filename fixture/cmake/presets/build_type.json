@@ -1,0 +1,37 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "build_type-debug",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_BUILD_TYPE": "debug",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "build_type-release",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_BUILD_TYPE": "release",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "build_type-relwithdebinfo",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_BUILD_TYPE": "relwithdebinfo",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "build_type-minsizerel",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_BUILD_TYPE": "minsizerel",
+        "CMAKE_BUILD_TYPE": "MinSizeRel"
+      }
+    }
+  ]
+}

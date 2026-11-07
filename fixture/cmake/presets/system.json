@@ -1,0 +1,29 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "system-macos",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SYSTEM": "macos"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "system-linux",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SYSTEM": "linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }
+  ]
+}

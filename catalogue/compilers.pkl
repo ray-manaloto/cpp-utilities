@@ -1,0 +1,64 @@
+/// What each compiler value stands for: the identity CMake reports, the
+/// systems it runs on and the programs the toolchain file names.
+module compilers
+
+import "axes.pkl"
+
+class Compiler {
+  /// `CMAKE_<LANG>_COMPILER_ID`.
+  id: "Clang"|"GNU"|"AppleClang"
+
+  /// The upstream version, as the first three parts of `CMAKE_<LANG>_COMPILER_VERSION`.
+  version: String(matches(Regex(#"\d+\.\d+\.\d+"#)))
+
+  /// The first eight hex digits of the fork commit `--version` prints, for a fork build.
+  commit: String(matches(Regex("[0-9a-f]{8}")))?
+
+  /// The C and C++ programs, by system. A system missing here does not run the compiler.
+  c: Map<axes.System, String>
+  cxx: Map<axes.System, String>
+
+  /// The axis value this identity spells: the family, then the version with `_`
+  /// for dots, or the commit for a fork build.
+  value: String =
+    let (family = if (commit != null) "clangp2996" else if (id == "GNU") "gcc" else id.toLowerCase())
+      if (commit != null) "\(family)_\(commit)" else family + version.replaceAll(".", "_")
+}
+
+compilers: Map<axes.Compiler, Compiler> = Map(
+  "clang23_1_4", new Compiler {
+    id = "Clang"
+    version = "23.1.4"
+    c = Map("macos", "clang", "linux", "clang")
+    cxx = Map("macos", "clang++", "linux", "clang++")
+  },
+  "gcc16_2_0", new Compiler {
+    id = "GNU"
+    version = "16.2.0"
+    // On macOS `gcc` is Apple clang under another name.
+    c = Map("macos", "gcc-16", "linux", "gcc")
+    cxx = Map("macos", "g++-16", "linux", "g++")
+  },
+  "gcc14_2_0", new Compiler {
+    id = "GNU"
+    version = "14.2.0"
+    c = Map("linux", "gcc-14")
+    cxx = Map("linux", "g++-14")
+  },
+  "appleclang21_0_0", new Compiler {
+    id = "AppleClang"
+    version = "21.0.0"
+    c = Map("macos", "/usr/bin/clang")
+    cxx = Map("macos", "/usr/bin/clang++")
+  },
+  "clangp2996_f17c8d6c", new Compiler {
+    id = "Clang"
+    version = "21.0.0"
+    commit = "f17c8d6c"
+    c = Map("macos", "clang-p2996", "linux", "clang-p2996")
+    cxx = Map("macos", "clang++-p2996", "linux", "clang++-p2996")
+  }
+)
+
+/// Compilers of the Clang family, Apple's and the fork included.
+clangFamily: List<axes.Compiler> = compilers.filter((_, c) -> c.id != "GNU").keys.toList()

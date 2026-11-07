@@ -1,0 +1,33 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "target_cpu-native",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_TARGET_CPU": "native"
+      }
+    },
+    {
+      "name": "target_cpu-znver2",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_TARGET_CPU": "znver2"
+      }
+    },
+    {
+      "name": "target_cpu-noavx",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_TARGET_CPU": "noavx"
+      }
+    },
+    {
+      "name": "target_cpu-arm64",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_TARGET_CPU": "arm64"
+      }
+    }
+  ]
+}

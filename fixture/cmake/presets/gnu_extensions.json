@@ -1,0 +1,23 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "gnu_extensions-gnu_on",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_GNU_EXTENSIONS": "gnu_on",
+        "CMAKE_C_EXTENSIONS": "ON",
+        "CMAKE_CXX_EXTENSIONS": "ON"
+      }
+    },
+    {
+      "name": "gnu_extensions-gnu_off",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_GNU_EXTENSIONS": "gnu_off",
+        "CMAKE_C_EXTENSIONS": "OFF",
+        "CMAKE_CXX_EXTENSIONS": "OFF"
+      }
+    }
+  ]
+}

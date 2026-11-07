@@ -1,0 +1,22 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "import_std-importstd_on",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_IMPORT_STD": "importstd_on",
+        "CMAKE_EXPERIMENTAL_CXX_IMPORT_STD": "f35a9ac6-8463-4d38-8eec-5d6008153e7d",
+        "CMAKE_CXX_MODULE_STD": "ON"
+      }
+    },
+    {
+      "name": "import_std-importstd_off",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_IMPORT_STD": "importstd_off",
+        "CMAKE_CXX_MODULE_STD": "OFF"
+      }
+    }
+  ]
+}

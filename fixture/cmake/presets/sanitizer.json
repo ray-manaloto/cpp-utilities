@@ -1,0 +1,193 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "sanitizer-none",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "none"
+      }
+    },
+    {
+      "name": "sanitizer-asan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "asan"
+      }
+    },
+    {
+      "name": "sanitizer-ubsan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "ubsan"
+      }
+    },
+    {
+      "name": "sanitizer-lsan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "lsan"
+      }
+    },
+    {
+      "name": "sanitizer-tsan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "tsan"
+      }
+    },
+    {
+      "name": "sanitizer-msan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "msan"
+      }
+    },
+    {
+      "name": "sanitizer-hwasan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "hwasan"
+      }
+    },
+    {
+      "name": "sanitizer-rtsan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "rtsan"
+      }
+    },
+    {
+      "name": "sanitizer-tysan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "tysan"
+      }
+    },
+    {
+      "name": "sanitizer-nsan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "nsan"
+      }
+    },
+    {
+      "name": "sanitizer-asan_ubsan",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_SANITIZER": "asan_ubsan"
+      }
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "profile-test-base",
+      "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "sanitizer-none",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ]
+    },
+    {
+      "name": "sanitizer-asan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "ASAN_OPTIONS": "halt_on_error=1:abort_on_error=1"
+      }
+    },
+    {
+      "name": "sanitizer-ubsan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      }
+    },
+    {
+      "name": "sanitizer-lsan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "LSAN_OPTIONS": "exitcode=23"
+      }
+    },
+    {
+      "name": "sanitizer-tsan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "TSAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "sanitizer-msan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "MSAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "sanitizer-hwasan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "HWASAN_OPTIONS": "halt_on_error=1"
+      }
+    },
+    {
+      "name": "sanitizer-rtsan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ]
+    },
+    {
+      "name": "sanitizer-tysan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ]
+    },
+    {
+      "name": "sanitizer-nsan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ]
+    },
+    {
+      "name": "sanitizer-asan_ubsan",
+      "hidden": true,
+      "inherits": [
+        "profile-test-base"
+      ],
+      "environment": {
+        "ASAN_OPTIONS": "halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      }
+    }
+  ]
+}

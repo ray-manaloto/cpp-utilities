@@ -1,0 +1,26 @@
+{
+  "version": 10,
+  "configurePresets": [
+    {
+      "name": "instrumentation-none",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_INSTRUMENTATION": "none"
+      }
+    },
+    {
+      "name": "instrumentation-xray",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_INSTRUMENTATION": "xray"
+      }
+    },
+    {
+      "name": "instrumentation-bolt",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_INSTRUMENTATION": "bolt"
+      }
+    }
+  ]
+}

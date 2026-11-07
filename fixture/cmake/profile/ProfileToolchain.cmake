@@ -1,0 +1,54 @@
+# Profile toolchain file. A Profile preset names it and sets PROFILE_<AXIS>
+# for every name axis; a vcpkg triplet chainloads it with the ABI axes only.
+# It picks the profile's compiler unless CMAKE_<LANG>_COMPILER is already set,
+# and starts the flag variables with the flags the profile adds. The check
+# module then refuses any compiler or flag that differs from the profile.
+include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+
+foreach(axis IN LISTS PROFILE_NAME_AXES)
+  string(TOUPPER "PROFILE_${axis}" var)
+  list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES "${var}")
+endforeach()
+list(REMOVE_DUPLICATES CMAKE_TRY_COMPILE_PLATFORM_VARIABLES)
+
+if(DEFINED PROFILE_COMPILER AND DEFINED PROFILE_SYSTEM)
+  foreach(lang IN ITEMS C CXX)
+    set(program "PROFILE_COMPILER_${PROFILE_COMPILER}_${lang}_${PROFILE_SYSTEM}")
+    if(NOT DEFINED CMAKE_${lang}_COMPILER AND DEFINED ${program})
+      set(CMAKE_${lang}_COMPILER "${${program}}")
+    endif()
+  endforeach()
+endif()
+
+# import std reads the standard library's modules metadata from the path the
+# compiler prints for libc++.modules.json. Some LLVM packages, such as
+# Homebrew's, install it under lib/c++/ where that lookup misses it, so look
+# there too when the profile asks for import std on a clang.
+if(PROFILE_IMPORT_STD STREQUAL "importstd_on" AND NOT DEFINED CMAKE_CXX_STDLIB_MODULES_JSON
+    AND "${PROFILE_COMPILER_${PROFILE_COMPILER}_ID}" STREQUAL "Clang" AND DEFINED CMAKE_CXX_COMPILER)
+  foreach(candidate IN ITEMS libc++.modules.json c++/libc++.modules.json)
+    execute_process(COMMAND "${CMAKE_CXX_COMPILER}" "-print-file-name=${candidate}"
+      OUTPUT_VARIABLE found OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET RESULT_VARIABLE failed)
+    if(NOT failed AND IS_ABSOLUTE "${found}" AND EXISTS "${found}")
+      cmake_path(NORMAL_PATH found)
+      set(CMAKE_CXX_STDLIB_MODULES_JSON "${found}")
+      break()
+    endif()
+  endforeach()
+  unset(candidate)
+  unset(found)
+  unset(failed)
+endif()
+
+foreach(lang IN ITEMS C CXX)
+  profile_flags(${lang} compile link)
+  list(JOIN compile " " compile)
+  set(CMAKE_${lang}_FLAGS_INIT "${compile}")
+endforeach()
+list(JOIN link " " link)
+foreach(kind IN ITEMS EXE SHARED MODULE)
+  set(CMAKE_${kind}_LINKER_FLAGS_INIT "${link}")
+endforeach()
+unset(compile)
+unset(link)
+unset(program)

@@ -1,0 +1,1442 @@
+examples {
+  ["cmake/presets/system.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "system-macos",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SYSTEM": "macos"
+          },
+          "condition": {
+            "type": "equals",
+            "lhs": "${hostSystemName}",
+            "rhs": "Darwin"
+          }
+        },
+        {
+          "name": "system-linux",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SYSTEM": "linux"
+          },
+          "condition": {
+            "type": "equals",
+            "lhs": "${hostSystemName}",
+            "rhs": "Linux"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/compiler.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "compiler-clang23_1_4",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_COMPILER": "clang23_1_4"
+          }
+        },
+        {
+          "name": "compiler-gcc16_2_0",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_COMPILER": "gcc16_2_0"
+          }
+        },
+        {
+          "name": "compiler-gcc14_2_0",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_COMPILER": "gcc14_2_0"
+          }
+        },
+        {
+          "name": "compiler-appleclang21_0_0",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_COMPILER": "appleclang21_0_0"
+          }
+        },
+        {
+          "name": "compiler-clangp2996_f17c8d6c",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_COMPILER": "clangp2996_f17c8d6c"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/build_type.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "build_type-debug",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_BUILD_TYPE": "debug",
+            "CMAKE_BUILD_TYPE": "Debug"
+          }
+        },
+        {
+          "name": "build_type-release",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_BUILD_TYPE": "release",
+            "CMAKE_BUILD_TYPE": "Release"
+          }
+        },
+        {
+          "name": "build_type-relwithdebinfo",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_BUILD_TYPE": "relwithdebinfo",
+            "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+          }
+        },
+        {
+          "name": "build_type-minsizerel",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_BUILD_TYPE": "minsizerel",
+            "CMAKE_BUILD_TYPE": "MinSizeRel"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/ipo.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "ipo-ipo_on",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_IPO": "ipo_on",
+            "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON"
+          }
+        },
+        {
+          "name": "ipo-ipo_off",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_IPO": "ipo_off",
+            "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "OFF"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/sanitizer.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "sanitizer-none",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "none"
+          }
+        },
+        {
+          "name": "sanitizer-asan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "asan"
+          }
+        },
+        {
+          "name": "sanitizer-ubsan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "ubsan"
+          }
+        },
+        {
+          "name": "sanitizer-lsan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "lsan"
+          }
+        },
+        {
+          "name": "sanitizer-tsan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "tsan"
+          }
+        },
+        {
+          "name": "sanitizer-msan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "msan"
+          }
+        },
+        {
+          "name": "sanitizer-hwasan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "hwasan"
+          }
+        },
+        {
+          "name": "sanitizer-rtsan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "rtsan"
+          }
+        },
+        {
+          "name": "sanitizer-tysan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "tysan"
+          }
+        },
+        {
+          "name": "sanitizer-nsan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "nsan"
+          }
+        },
+        {
+          "name": "sanitizer-asan_ubsan",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_SANITIZER": "asan_ubsan"
+          }
+        }
+      ],
+      "testPresets": [
+        {
+          "name": "profile-test-base",
+          "hidden": true,
+          "output": {
+            "outputOnFailure": true
+          },
+          "execution": {
+            "noTestsAction": "error"
+          }
+        },
+        {
+          "name": "sanitizer-none",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ]
+        },
+        {
+          "name": "sanitizer-asan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "ASAN_OPTIONS": "halt_on_error=1:abort_on_error=1"
+          }
+        },
+        {
+          "name": "sanitizer-ubsan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+          }
+        },
+        {
+          "name": "sanitizer-lsan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "LSAN_OPTIONS": "exitcode=23"
+          }
+        },
+        {
+          "name": "sanitizer-tsan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "TSAN_OPTIONS": "halt_on_error=1"
+          }
+        },
+        {
+          "name": "sanitizer-msan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "MSAN_OPTIONS": "halt_on_error=1"
+          }
+        },
+        {
+          "name": "sanitizer-hwasan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "HWASAN_OPTIONS": "halt_on_error=1"
+          }
+        },
+        {
+          "name": "sanitizer-rtsan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ]
+        },
+        {
+          "name": "sanitizer-tysan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ]
+        },
+        {
+          "name": "sanitizer-nsan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ]
+        },
+        {
+          "name": "sanitizer-asan_ubsan",
+          "hidden": true,
+          "inherits": [
+            "profile-test-base"
+          ],
+          "environment": {
+            "ASAN_OPTIONS": "halt_on_error=1:abort_on_error=1",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/instrumentation.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "instrumentation-none",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_INSTRUMENTATION": "none"
+          }
+        },
+        {
+          "name": "instrumentation-xray",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_INSTRUMENTATION": "xray"
+          }
+        },
+        {
+          "name": "instrumentation-bolt",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_INSTRUMENTATION": "bolt"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/target_cpu.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "target_cpu-native",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_TARGET_CPU": "native"
+          }
+        },
+        {
+          "name": "target_cpu-znver2",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_TARGET_CPU": "znver2"
+          }
+        },
+        {
+          "name": "target_cpu-noavx",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_TARGET_CPU": "noavx"
+          }
+        },
+        {
+          "name": "target_cpu-arm64",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_TARGET_CPU": "arm64"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/cxx_standard.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "cxx_standard-cxx20",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_CXX_STANDARD": "cxx20",
+            "CMAKE_CXX_STANDARD": "20",
+            "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+          }
+        },
+        {
+          "name": "cxx_standard-cxx23",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_CXX_STANDARD": "cxx23",
+            "CMAKE_CXX_STANDARD": "23",
+            "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+          }
+        },
+        {
+          "name": "cxx_standard-cxx26",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_CXX_STANDARD": "cxx26",
+            "CMAKE_CXX_STANDARD": "26",
+            "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/c_standard.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "c_standard-c17",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_C_STANDARD": "c17",
+            "CMAKE_C_STANDARD": "17",
+            "CMAKE_C_STANDARD_REQUIRED": "ON"
+          }
+        },
+        {
+          "name": "c_standard-c23",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_C_STANDARD": "c23",
+            "CMAKE_C_STANDARD": "23",
+            "CMAKE_C_STANDARD_REQUIRED": "ON"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/gnu_extensions.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "gnu_extensions-gnu_on",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_GNU_EXTENSIONS": "gnu_on",
+            "CMAKE_C_EXTENSIONS": "ON",
+            "CMAKE_CXX_EXTENSIONS": "ON"
+          }
+        },
+        {
+          "name": "gnu_extensions-gnu_off",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_GNU_EXTENSIONS": "gnu_off",
+            "CMAKE_C_EXTENSIONS": "OFF",
+            "CMAKE_CXX_EXTENSIONS": "OFF"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/import_std.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "import_std-importstd_on",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_IMPORT_STD": "importstd_on",
+            "CMAKE_EXPERIMENTAL_CXX_IMPORT_STD": "f35a9ac6-8463-4d38-8eec-5d6008153e7d",
+            "CMAKE_CXX_MODULE_STD": "ON"
+          }
+        },
+        {
+          "name": "import_std-importstd_off",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_IMPORT_STD": "importstd_off",
+            "CMAKE_CXX_MODULE_STD": "OFF"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/reflection.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "reflection-refl_on",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_REFLECTION": "refl_on"
+          }
+        },
+        {
+          "name": "reflection-refl_off",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_REFLECTION": "refl_off"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/pch.json"] {
+    """
+    {
+      "version": 10,
+      "configurePresets": [
+        {
+          "name": "pch-pch_on",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_PCH": "pch_on",
+            "CMAKE_DISABLE_PRECOMPILE_HEADERS": "OFF"
+          }
+        },
+        {
+          "name": "pch-pch_off",
+          "hidden": true,
+          "cacheVariables": {
+            "PROFILE_PCH": "pch_off",
+            "CMAKE_DISABLE_PRECOMPILE_HEADERS": "ON"
+          }
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/presets/profiles.json"] {
+    """
+    {
+      "version": 10,
+      "include": [
+        "system.json",
+        "compiler.json",
+        "build_type.json",
+        "ipo.json",
+        "sanitizer.json",
+        "instrumentation.json",
+        "target_cpu.json",
+        "cxx_standard.json",
+        "c_standard.json",
+        "gnu_extensions.json",
+        "import_std.json",
+        "reflection.json",
+        "pch.json"
+      ],
+      "configurePresets": [
+        {
+          "name": "profile-base",
+          "hidden": true,
+          "toolchainFile": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+          "cacheVariables": {
+            "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/cmake/profile/ProfileRules.cmake",
+            "CMAKE_PROJECT_INCLUDE": "${sourceDir}/cmake/profile/ProfileCheck.cmake"
+          }
+        },
+        {
+          "name": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+          "hidden": true,
+          "inherits": [
+            "profile-base",
+            "system-macos",
+            "compiler-clang23_1_4",
+            "build_type-debug",
+            "ipo-ipo_off",
+            "sanitizer-asan_ubsan",
+            "instrumentation-none",
+            "target_cpu-native",
+            "cxx_standard-cxx23",
+            "c_standard-c17",
+            "gnu_extensions-gnu_off",
+            "import_std-importstd_off",
+            "reflection-refl_off",
+            "pch-pch_off"
+          ],
+          "cacheVariables": {
+            "PROFILE_NAME": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+          }
+        },
+        {
+          "name": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+          "hidden": true,
+          "inherits": [
+            "profile-base",
+            "system-linux",
+            "compiler-clangp2996_f17c8d6c",
+            "build_type-release",
+            "ipo-ipo_off",
+            "sanitizer-none",
+            "instrumentation-none",
+            "target_cpu-native",
+            "cxx_standard-cxx26",
+            "c_standard-c17",
+            "gnu_extensions-gnu_off",
+            "import_std-importstd_off",
+            "reflection-refl_on",
+            "pch-pch_off"
+          ],
+          "cacheVariables": {
+            "PROFILE_NAME": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+          }
+        }
+      ],
+      "testPresets": [
+        {
+          "name": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off",
+          "hidden": true,
+          "inherits": [
+            "sanitizer-asan_ubsan"
+          ]
+        },
+        {
+          "name": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off",
+          "hidden": true,
+          "inherits": [
+            "sanitizer-none"
+          ]
+        }
+      ]
+    }
+    
+    """
+  }
+  ["cmake/profile/profile-data.cmake"] {
+    """
+    # Generated by the profile catalogue; do not edit.
+    # The catalogue's axes, compilers, settings, flags and rules for ProfileCommon.cmake.
+    include_guard(GLOBAL)
+    set(PROFILE_NAME_AXES "system" "compiler" "build_type" "ipo" "sanitizer" "instrumentation" "target_cpu" "cxx_standard" "c_standard" "gnu_extensions" "import_std" "reflection" "pch")
+    set(PROFILE_CONTEXT_AXES "arch" "generator" "launcher")
+    set(PROFILE_SANITIZER_MEMBERS "asan" "ubsan" "lsan" "tsan" "msan" "hwasan" "rtsan" "tysan" "nsan")
+    set(PROFILE_AXIS_system_VALUES "macos" "linux")
+    set(PROFILE_AXIS_compiler_VALUES "clang23_1_4" "gcc16_2_0" "gcc14_2_0" "appleclang21_0_0" "clangp2996_f17c8d6c")
+    set(PROFILE_AXIS_build_type_VALUES "debug" "release" "relwithdebinfo" "minsizerel")
+    set(PROFILE_AXIS_ipo_VALUES "ipo_on" "ipo_off")
+    set(PROFILE_AXIS_instrumentation_VALUES "none" "xray" "bolt")
+    set(PROFILE_AXIS_target_cpu_VALUES "native" "znver2" "noavx" "arm64")
+    set(PROFILE_AXIS_cxx_standard_VALUES "cxx20" "cxx23" "cxx26")
+    set(PROFILE_AXIS_c_standard_VALUES "c17" "c23")
+    set(PROFILE_AXIS_gnu_extensions_VALUES "gnu_on" "gnu_off")
+    set(PROFILE_AXIS_import_std_VALUES "importstd_on" "importstd_off")
+    set(PROFILE_AXIS_reflection_VALUES "refl_on" "refl_off")
+    set(PROFILE_AXIS_pch_VALUES "pch_on" "pch_off")
+    set(PROFILE_AXIS_arch_VALUES "amd64" "arm64")
+    set(PROFILE_AXIS_generator_VALUES "ninja" "ninja_multi_config" "unix_makefiles" "xcode")
+    set(PROFILE_AXIS_launcher_VALUES "none" "ccache" "sccache")
+    set(PROFILE_COMPILERS "clang23_1_4" "gcc16_2_0" "gcc14_2_0" "appleclang21_0_0" "clangp2996_f17c8d6c")
+    set(PROFILE_COMPILER_clang23_1_4_ID "Clang")
+    set(PROFILE_COMPILER_clang23_1_4_VERSION "23.1.4")
+    set(PROFILE_COMPILER_clang23_1_4_COMMIT)
+    set(PROFILE_COMPILER_clang23_1_4_C_macos "clang")
+    set(PROFILE_COMPILER_clang23_1_4_C_linux "clang")
+    set(PROFILE_COMPILER_clang23_1_4_CXX_macos "clang++")
+    set(PROFILE_COMPILER_clang23_1_4_CXX_linux "clang++")
+    set(PROFILE_COMPILER_gcc16_2_0_ID "GNU")
+    set(PROFILE_COMPILER_gcc16_2_0_VERSION "16.2.0")
+    set(PROFILE_COMPILER_gcc16_2_0_COMMIT)
+    set(PROFILE_COMPILER_gcc16_2_0_C_macos "gcc-16")
+    set(PROFILE_COMPILER_gcc16_2_0_C_linux "gcc")
+    set(PROFILE_COMPILER_gcc16_2_0_CXX_macos "g++-16")
+    set(PROFILE_COMPILER_gcc16_2_0_CXX_linux "g++")
+    set(PROFILE_COMPILER_gcc14_2_0_ID "GNU")
+    set(PROFILE_COMPILER_gcc14_2_0_VERSION "14.2.0")
+    set(PROFILE_COMPILER_gcc14_2_0_COMMIT)
+    set(PROFILE_COMPILER_gcc14_2_0_C_linux "gcc-14")
+    set(PROFILE_COMPILER_gcc14_2_0_CXX_linux "g++-14")
+    set(PROFILE_COMPILER_appleclang21_0_0_ID "AppleClang")
+    set(PROFILE_COMPILER_appleclang21_0_0_VERSION "21.0.0")
+    set(PROFILE_COMPILER_appleclang21_0_0_COMMIT)
+    set(PROFILE_COMPILER_appleclang21_0_0_C_macos "/usr/bin/clang")
+    set(PROFILE_COMPILER_appleclang21_0_0_CXX_macos "/usr/bin/clang++")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_ID "Clang")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_VERSION "21.0.0")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_COMMIT "f17c8d6c")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_C_macos "clang-p2996")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_C_linux "clang-p2996")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_CXX_macos "clang++-p2996")
+    set(PROFILE_COMPILER_clangp2996_f17c8d6c_CXX_linux "clang++-p2996")
+    set(PROFILE_SETTINGS_build_type_debug "CMAKE_BUILD_TYPE=Debug")
+    set(PROFILE_SETTINGS_build_type_release "CMAKE_BUILD_TYPE=Release")
+    set(PROFILE_SETTINGS_build_type_relwithdebinfo "CMAKE_BUILD_TYPE=RelWithDebInfo")
+    set(PROFILE_SETTINGS_build_type_minsizerel "CMAKE_BUILD_TYPE=MinSizeRel")
+    set(PROFILE_SETTINGS_ipo_ipo_on "CMAKE_INTERPROCEDURAL_OPTIMIZATION=ON")
+    set(PROFILE_SETTINGS_ipo_ipo_off "CMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF")
+    set(PROFILE_SETTINGS_cxx_standard_cxx20 "CMAKE_CXX_STANDARD=20" "CMAKE_CXX_STANDARD_REQUIRED=ON")
+    set(PROFILE_SETTINGS_cxx_standard_cxx23 "CMAKE_CXX_STANDARD=23" "CMAKE_CXX_STANDARD_REQUIRED=ON")
+    set(PROFILE_SETTINGS_cxx_standard_cxx26 "CMAKE_CXX_STANDARD=26" "CMAKE_CXX_STANDARD_REQUIRED=ON")
+    set(PROFILE_SETTINGS_c_standard_c17 "CMAKE_C_STANDARD=17" "CMAKE_C_STANDARD_REQUIRED=ON")
+    set(PROFILE_SETTINGS_c_standard_c23 "CMAKE_C_STANDARD=23" "CMAKE_C_STANDARD_REQUIRED=ON")
+    set(PROFILE_SETTINGS_gnu_extensions_gnu_on "CMAKE_C_EXTENSIONS=ON" "CMAKE_CXX_EXTENSIONS=ON")
+    set(PROFILE_SETTINGS_gnu_extensions_gnu_off "CMAKE_C_EXTENSIONS=OFF" "CMAKE_CXX_EXTENSIONS=OFF")
+    set(PROFILE_SETTINGS_import_std_importstd_on "CMAKE_EXPERIMENTAL_CXX_IMPORT_STD=f35a9ac6-8463-4d38-8eec-5d6008153e7d" "CMAKE_CXX_MODULE_STD=ON")
+    set(PROFILE_SETTINGS_import_std_importstd_off "CMAKE_CXX_MODULE_STD=OFF")
+    set(PROFILE_SETTINGS_pch_pch_on "CMAKE_DISABLE_PRECOMPILE_HEADERS=OFF")
+    set(PROFILE_SETTINGS_pch_pch_off "CMAKE_DISABLE_PRECOMPILE_HEADERS=ON")
+    set(PROFILE_FLAG_ROWS "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17")
+    set(PROFILE_FLAG_1_AXIS "sanitizers")
+    set(PROFILE_FLAG_1_VALUE "asan")
+    set(PROFILE_FLAG_1_COMPILERS)
+    set(PROFILE_FLAG_1_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_1_COMPILE "-fsanitize=address" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_1_LINK "-fsanitize=address")
+    set(PROFILE_FLAG_2_AXIS "sanitizers")
+    set(PROFILE_FLAG_2_VALUE "ubsan")
+    set(PROFILE_FLAG_2_COMPILERS)
+    set(PROFILE_FLAG_2_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_2_COMPILE "-fsanitize=undefined" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_2_LINK "-fsanitize=undefined")
+    set(PROFILE_FLAG_3_AXIS "sanitizers")
+    set(PROFILE_FLAG_3_VALUE "lsan")
+    set(PROFILE_FLAG_3_COMPILERS)
+    set(PROFILE_FLAG_3_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_3_COMPILE "-fsanitize=leak" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_3_LINK "-fsanitize=leak")
+    set(PROFILE_FLAG_4_AXIS "sanitizers")
+    set(PROFILE_FLAG_4_VALUE "tsan")
+    set(PROFILE_FLAG_4_COMPILERS)
+    set(PROFILE_FLAG_4_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_4_COMPILE "-fsanitize=thread" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_4_LINK "-fsanitize=thread")
+    set(PROFILE_FLAG_5_AXIS "sanitizers")
+    set(PROFILE_FLAG_5_VALUE "msan")
+    set(PROFILE_FLAG_5_COMPILERS)
+    set(PROFILE_FLAG_5_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_5_COMPILE "-fsanitize=memory" "-fno-omit-frame-pointer" "-fsanitize-memory-track-origins")
+    set(PROFILE_FLAG_5_LINK "-fsanitize=memory")
+    set(PROFILE_FLAG_6_AXIS "sanitizers")
+    set(PROFILE_FLAG_6_VALUE "hwasan")
+    set(PROFILE_FLAG_6_COMPILERS)
+    set(PROFILE_FLAG_6_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_6_COMPILE "-fsanitize=hwaddress" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_6_LINK "-fsanitize=hwaddress")
+    set(PROFILE_FLAG_7_AXIS "sanitizers")
+    set(PROFILE_FLAG_7_VALUE "rtsan")
+    set(PROFILE_FLAG_7_COMPILERS)
+    set(PROFILE_FLAG_7_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_7_COMPILE "-fsanitize=realtime" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_7_LINK "-fsanitize=realtime")
+    set(PROFILE_FLAG_8_AXIS "sanitizers")
+    set(PROFILE_FLAG_8_VALUE "tysan")
+    set(PROFILE_FLAG_8_COMPILERS)
+    set(PROFILE_FLAG_8_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_8_COMPILE "-fsanitize=type" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_8_LINK "-fsanitize=type")
+    set(PROFILE_FLAG_9_AXIS "sanitizers")
+    set(PROFILE_FLAG_9_VALUE "nsan")
+    set(PROFILE_FLAG_9_COMPILERS)
+    set(PROFILE_FLAG_9_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_9_COMPILE "-fsanitize=numerical" "-fno-omit-frame-pointer")
+    set(PROFILE_FLAG_9_LINK "-fsanitize=numerical")
+    set(PROFILE_FLAG_10_AXIS "instrumentation")
+    set(PROFILE_FLAG_10_VALUE "xray")
+    set(PROFILE_FLAG_10_COMPILERS)
+    set(PROFILE_FLAG_10_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_10_COMPILE "-fxray-instrument")
+    set(PROFILE_FLAG_10_LINK "-fxray-instrument")
+    set(PROFILE_FLAG_11_AXIS "instrumentation")
+    set(PROFILE_FLAG_11_VALUE "bolt")
+    set(PROFILE_FLAG_11_COMPILERS)
+    set(PROFILE_FLAG_11_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_11_COMPILE)
+    set(PROFILE_FLAG_11_LINK "-Wl,--emit-relocs")
+    set(PROFILE_FLAG_12_AXIS "target_cpu")
+    set(PROFILE_FLAG_12_VALUE "native")
+    set(PROFILE_FLAG_12_COMPILERS)
+    set(PROFILE_FLAG_12_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_12_COMPILE "-march=native")
+    set(PROFILE_FLAG_12_LINK)
+    set(PROFILE_FLAG_13_AXIS "target_cpu")
+    set(PROFILE_FLAG_13_VALUE "znver2")
+    set(PROFILE_FLAG_13_COMPILERS)
+    set(PROFILE_FLAG_13_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_13_COMPILE "-march=znver2")
+    set(PROFILE_FLAG_13_LINK)
+    set(PROFILE_FLAG_14_AXIS "target_cpu")
+    set(PROFILE_FLAG_14_VALUE "noavx")
+    set(PROFILE_FLAG_14_COMPILERS)
+    set(PROFILE_FLAG_14_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_14_COMPILE "-march=x86-64-v2")
+    set(PROFILE_FLAG_14_LINK)
+    set(PROFILE_FLAG_15_AXIS "target_cpu")
+    set(PROFILE_FLAG_15_VALUE "arm64")
+    set(PROFILE_FLAG_15_COMPILERS)
+    set(PROFILE_FLAG_15_LANGUAGES "C" "CXX")
+    set(PROFILE_FLAG_15_COMPILE "-march=armv8-a")
+    set(PROFILE_FLAG_15_LINK)
+    set(PROFILE_FLAG_16_AXIS "reflection")
+    set(PROFILE_FLAG_16_VALUE "refl_on")
+    set(PROFILE_FLAG_16_COMPILERS "gcc16_2_0")
+    set(PROFILE_FLAG_16_LANGUAGES "CXX")
+    set(PROFILE_FLAG_16_COMPILE "-freflection")
+    set(PROFILE_FLAG_16_LINK)
+    set(PROFILE_FLAG_17_AXIS "reflection")
+    set(PROFILE_FLAG_17_VALUE "refl_on")
+    set(PROFILE_FLAG_17_COMPILERS "clangp2996_f17c8d6c")
+    set(PROFILE_FLAG_17_LANGUAGES "CXX")
+    set(PROFILE_FLAG_17_COMPILE "-freflection" "-fexpansion-statements")
+    set(PROFILE_FLAG_17_LINK)
+    set(PROFILE_RULES "compiler_system_gcc14_2_0" "compiler_system_appleclang21_0_0" "sanitizer_tsan_asan" "sanitizer_tsan_msan" "sanitizer_msan_asan" "sanitizer_hwasan_asan" "sanitizer_clang" "sanitizer_hwasan_arch" "sanitizer_nsan_arch" "sanitizer_macos" "xray_clang" "xray_macos" "bolt_macos" "cpu_arm64" "cpu_amd64" "reflection_standard" "reflection_compiler" "importstd_compiler" "importstd_generator" "importstd_standard" "pch_sccache")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_MESSAGE "gcc14_2_0 runs on linux only")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_CONDITIONS "1" "2")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_1_AXIS "compiler")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_1_NEGATED "FALSE")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_1_VALUES "gcc14_2_0")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_2_AXIS "system")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_2_NEGATED "TRUE")
+    set(PROFILE_RULE_compiler_system_gcc14_2_0_2_VALUES "linux")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_MESSAGE "appleclang21_0_0 runs on macos only")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_CONDITIONS "1" "2")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_1_AXIS "compiler")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_1_NEGATED "FALSE")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_1_VALUES "appleclang21_0_0")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_2_AXIS "system")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_2_NEGATED "TRUE")
+    set(PROFILE_RULE_compiler_system_appleclang21_0_0_2_VALUES "macos")
+    set(PROFILE_RULE_sanitizer_tsan_asan_MESSAGE "tsan excludes asan")
+    set(PROFILE_RULE_sanitizer_tsan_asan_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_tsan_asan_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_tsan_asan_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_tsan_asan_1_VALUES "tsan")
+    set(PROFILE_RULE_sanitizer_tsan_asan_2_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_tsan_asan_2_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_tsan_asan_2_VALUES "asan")
+    set(PROFILE_RULE_sanitizer_tsan_msan_MESSAGE "tsan excludes msan")
+    set(PROFILE_RULE_sanitizer_tsan_msan_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_tsan_msan_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_tsan_msan_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_tsan_msan_1_VALUES "tsan")
+    set(PROFILE_RULE_sanitizer_tsan_msan_2_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_tsan_msan_2_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_tsan_msan_2_VALUES "msan")
+    set(PROFILE_RULE_sanitizer_msan_asan_MESSAGE "msan excludes asan")
+    set(PROFILE_RULE_sanitizer_msan_asan_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_msan_asan_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_msan_asan_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_msan_asan_1_VALUES "msan")
+    set(PROFILE_RULE_sanitizer_msan_asan_2_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_msan_asan_2_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_msan_asan_2_VALUES "asan")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_MESSAGE "hwasan excludes asan")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_1_VALUES "hwasan")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_2_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_2_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_hwasan_asan_2_VALUES "asan")
+    set(PROFILE_RULE_sanitizer_clang_MESSAGE "msan, rtsan, tysan and nsan need a clang compiler")
+    set(PROFILE_RULE_sanitizer_clang_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_clang_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_clang_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_clang_1_VALUES "msan" "rtsan" "tysan" "nsan")
+    set(PROFILE_RULE_sanitizer_clang_2_AXIS "compiler")
+    set(PROFILE_RULE_sanitizer_clang_2_NEGATED "TRUE")
+    set(PROFILE_RULE_sanitizer_clang_2_VALUES "clang23_1_4" "appleclang21_0_0" "clangp2996_f17c8d6c")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_MESSAGE "hwasan needs arm64")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_1_VALUES "hwasan")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_2_AXIS "arch")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_2_NEGATED "TRUE")
+    set(PROFILE_RULE_sanitizer_hwasan_arch_2_VALUES "arm64")
+    set(PROFILE_RULE_sanitizer_nsan_arch_MESSAGE "nsan needs amd64")
+    set(PROFILE_RULE_sanitizer_nsan_arch_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_nsan_arch_1_AXIS "sanitizers")
+    set(PROFILE_RULE_sanitizer_nsan_arch_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_nsan_arch_1_VALUES "nsan")
+    set(PROFILE_RULE_sanitizer_nsan_arch_2_AXIS "arch")
+    set(PROFILE_RULE_sanitizer_nsan_arch_2_NEGATED "TRUE")
+    set(PROFILE_RULE_sanitizer_nsan_arch_2_VALUES "amd64")
+    set(PROFILE_RULE_sanitizer_macos_MESSAGE "macos allows only the sanitizers ubsan, and asan with ubsan")
+    set(PROFILE_RULE_sanitizer_macos_CONDITIONS "1" "2")
+    set(PROFILE_RULE_sanitizer_macos_1_AXIS "system")
+    set(PROFILE_RULE_sanitizer_macos_1_NEGATED "FALSE")
+    set(PROFILE_RULE_sanitizer_macos_1_VALUES "macos")
+    set(PROFILE_RULE_sanitizer_macos_2_AXIS "sanitizer")
+    set(PROFILE_RULE_sanitizer_macos_2_NEGATED "TRUE")
+    set(PROFILE_RULE_sanitizer_macos_2_VALUES "none" "ubsan" "asan_ubsan")
+    set(PROFILE_RULE_xray_clang_MESSAGE "xray needs a clang compiler")
+    set(PROFILE_RULE_xray_clang_CONDITIONS "1" "2")
+    set(PROFILE_RULE_xray_clang_1_AXIS "instrumentation")
+    set(PROFILE_RULE_xray_clang_1_NEGATED "FALSE")
+    set(PROFILE_RULE_xray_clang_1_VALUES "xray")
+    set(PROFILE_RULE_xray_clang_2_AXIS "compiler")
+    set(PROFILE_RULE_xray_clang_2_NEGATED "TRUE")
+    set(PROFILE_RULE_xray_clang_2_VALUES "clang23_1_4" "appleclang21_0_0" "clangp2996_f17c8d6c")
+    set(PROFILE_RULE_xray_macos_MESSAGE "xray has no runtime on macos")
+    set(PROFILE_RULE_xray_macos_CONDITIONS "1" "2")
+    set(PROFILE_RULE_xray_macos_1_AXIS "instrumentation")
+    set(PROFILE_RULE_xray_macos_1_NEGATED "FALSE")
+    set(PROFILE_RULE_xray_macos_1_VALUES "xray")
+    set(PROFILE_RULE_xray_macos_2_AXIS "system")
+    set(PROFILE_RULE_xray_macos_2_NEGATED "FALSE")
+    set(PROFILE_RULE_xray_macos_2_VALUES "macos")
+    set(PROFILE_RULE_bolt_macos_MESSAGE "bolt rewrites ELF binaries and runs on linux only")
+    set(PROFILE_RULE_bolt_macos_CONDITIONS "1" "2")
+    set(PROFILE_RULE_bolt_macos_1_AXIS "instrumentation")
+    set(PROFILE_RULE_bolt_macos_1_NEGATED "FALSE")
+    set(PROFILE_RULE_bolt_macos_1_VALUES "bolt")
+    set(PROFILE_RULE_bolt_macos_2_AXIS "system")
+    set(PROFILE_RULE_bolt_macos_2_NEGATED "FALSE")
+    set(PROFILE_RULE_bolt_macos_2_VALUES "macos")
+    set(PROFILE_RULE_cpu_arm64_MESSAGE "arm64 excludes the znver2 and noavx pins")
+    set(PROFILE_RULE_cpu_arm64_CONDITIONS "1" "2")
+    set(PROFILE_RULE_cpu_arm64_1_AXIS "arch")
+    set(PROFILE_RULE_cpu_arm64_1_NEGATED "FALSE")
+    set(PROFILE_RULE_cpu_arm64_1_VALUES "arm64")
+    set(PROFILE_RULE_cpu_arm64_2_AXIS "target_cpu")
+    set(PROFILE_RULE_cpu_arm64_2_NEGATED "FALSE")
+    set(PROFILE_RULE_cpu_arm64_2_VALUES "znver2" "noavx")
+    set(PROFILE_RULE_cpu_amd64_MESSAGE "amd64 excludes the arm64 pin")
+    set(PROFILE_RULE_cpu_amd64_CONDITIONS "1" "2")
+    set(PROFILE_RULE_cpu_amd64_1_AXIS "arch")
+    set(PROFILE_RULE_cpu_amd64_1_NEGATED "FALSE")
+    set(PROFILE_RULE_cpu_amd64_1_VALUES "amd64")
+    set(PROFILE_RULE_cpu_amd64_2_AXIS "target_cpu")
+    set(PROFILE_RULE_cpu_amd64_2_NEGATED "FALSE")
+    set(PROFILE_RULE_cpu_amd64_2_VALUES "arm64")
+    set(PROFILE_RULE_reflection_standard_MESSAGE "reflection needs cxx26")
+    set(PROFILE_RULE_reflection_standard_CONDITIONS "1" "2")
+    set(PROFILE_RULE_reflection_standard_1_AXIS "reflection")
+    set(PROFILE_RULE_reflection_standard_1_NEGATED "FALSE")
+    set(PROFILE_RULE_reflection_standard_1_VALUES "refl_on")
+    set(PROFILE_RULE_reflection_standard_2_AXIS "cxx_standard")
+    set(PROFILE_RULE_reflection_standard_2_NEGATED "TRUE")
+    set(PROFILE_RULE_reflection_standard_2_VALUES "cxx26")
+    set(PROFILE_RULE_reflection_compiler_MESSAGE "reflection needs gcc16_2_0 or clangp2996_f17c8d6c")
+    set(PROFILE_RULE_reflection_compiler_CONDITIONS "1" "2")
+    set(PROFILE_RULE_reflection_compiler_1_AXIS "reflection")
+    set(PROFILE_RULE_reflection_compiler_1_NEGATED "FALSE")
+    set(PROFILE_RULE_reflection_compiler_1_VALUES "refl_on")
+    set(PROFILE_RULE_reflection_compiler_2_AXIS "compiler")
+    set(PROFILE_RULE_reflection_compiler_2_NEGATED "TRUE")
+    set(PROFILE_RULE_reflection_compiler_2_VALUES "gcc16_2_0" "clangp2996_f17c8d6c")
+    set(PROFILE_RULE_importstd_compiler_MESSAGE "import std is refused on appleclang21_0_0 and gcc14_2_0")
+    set(PROFILE_RULE_importstd_compiler_CONDITIONS "1" "2")
+    set(PROFILE_RULE_importstd_compiler_1_AXIS "import_std")
+    set(PROFILE_RULE_importstd_compiler_1_NEGATED "FALSE")
+    set(PROFILE_RULE_importstd_compiler_1_VALUES "importstd_on")
+    set(PROFILE_RULE_importstd_compiler_2_AXIS "compiler")
+    set(PROFILE_RULE_importstd_compiler_2_NEGATED "FALSE")
+    set(PROFILE_RULE_importstd_compiler_2_VALUES "appleclang21_0_0" "gcc14_2_0")
+    set(PROFILE_RULE_importstd_generator_MESSAGE "import std needs a Ninja generator")
+    set(PROFILE_RULE_importstd_generator_CONDITIONS "1" "2")
+    set(PROFILE_RULE_importstd_generator_1_AXIS "import_std")
+    set(PROFILE_RULE_importstd_generator_1_NEGATED "FALSE")
+    set(PROFILE_RULE_importstd_generator_1_VALUES "importstd_on")
+    set(PROFILE_RULE_importstd_generator_2_AXIS "generator")
+    set(PROFILE_RULE_importstd_generator_2_NEGATED "TRUE")
+    set(PROFILE_RULE_importstd_generator_2_VALUES "ninja" "ninja_multi_config")
+    set(PROFILE_RULE_importstd_standard_MESSAGE "import std needs cxx23 or later")
+    set(PROFILE_RULE_importstd_standard_CONDITIONS "1" "2")
+    set(PROFILE_RULE_importstd_standard_1_AXIS "import_std")
+    set(PROFILE_RULE_importstd_standard_1_NEGATED "FALSE")
+    set(PROFILE_RULE_importstd_standard_1_VALUES "importstd_on")
+    set(PROFILE_RULE_importstd_standard_2_AXIS "cxx_standard")
+    set(PROFILE_RULE_importstd_standard_2_NEGATED "FALSE")
+    set(PROFILE_RULE_importstd_standard_2_VALUES "cxx20")
+    set(PROFILE_RULE_pch_sccache_MESSAGE "pch is refused on gcc16_2_0 under sccache")
+    set(PROFILE_RULE_pch_sccache_CONDITIONS "1" "2" "3")
+    set(PROFILE_RULE_pch_sccache_1_AXIS "pch")
+    set(PROFILE_RULE_pch_sccache_1_NEGATED "FALSE")
+    set(PROFILE_RULE_pch_sccache_1_VALUES "pch_on")
+    set(PROFILE_RULE_pch_sccache_2_AXIS "compiler")
+    set(PROFILE_RULE_pch_sccache_2_NEGATED "FALSE")
+    set(PROFILE_RULE_pch_sccache_2_VALUES "gcc16_2_0")
+    set(PROFILE_RULE_pch_sccache_3_AXIS "launcher")
+    set(PROFILE_RULE_pch_sccache_3_NEGATED "FALSE")
+    set(PROFILE_RULE_pch_sccache_3_VALUES "sccache")
+    
+    """
+  }
+  ["cmake/profile/ProfileCommon.cmake"] {
+    #"""
+    # Shared by ProfileToolchain.cmake and ProfileCheck.cmake. It reads the
+    # catalogue's tables from profile-data.cmake, emitted beside it.
+    include_guard(GLOBAL)
+    include("${CMAKE_CURRENT_LIST_DIR}/profile-data.cmake")
+    
+    # The sanitizers a sanitizer value holds: none for `none`, else its `_` parts.
+    function(profile_sanitizer_members value out)
+      if(value STREQUAL "none" OR value STREQUAL "")
+        set(${out} "" PARENT_SCOPE)
+      else()
+        string(REPLACE "_" ";" members "${value}")
+        set(${out} "${members}" PARENT_SCOPE)
+      endif()
+    endfunction()
+    
+    # The flags the profile in PROFILE_<AXIS> adds: compile flags for <lang>, and link flags.
+    function(profile_flags lang out_compile out_link)
+      set(compile "")
+      set(link "")
+      profile_sanitizer_members("${PROFILE_SANITIZER}" members)
+      foreach(i IN LISTS PROFILE_FLAG_ROWS)
+        set(axis "${PROFILE_FLAG_${i}_AXIS}")
+        set(value "${PROFILE_FLAG_${i}_VALUE}")
+        if(axis STREQUAL "sanitizers")
+          if(NOT value IN_LIST members)
+            continue()
+          endif()
+        else()
+          string(TOUPPER "${axis}" up)
+          if(NOT "${PROFILE_${up}}" STREQUAL "${value}")
+            continue()
+          endif()
+        endif()
+        if(PROFILE_FLAG_${i}_COMPILERS AND NOT "${PROFILE_COMPILER}" IN_LIST PROFILE_FLAG_${i}_COMPILERS)
+          continue()
+        endif()
+        if(lang IN_LIST PROFILE_FLAG_${i}_LANGUAGES)
+          list(APPEND compile ${PROFILE_FLAG_${i}_COMPILE})
+        endif()
+        list(APPEND link ${PROFILE_FLAG_${i}_LINK})
+      endforeach()
+      list(REMOVE_DUPLICATES compile)
+      list(REMOVE_DUPLICATES link)
+      set(${out_compile} "${compile}" PARENT_SCOPE)
+      set(${out_link} "${link}" PARENT_SCOPE)
+    endfunction()
+    
+    # Stops configure listing every refusal, if there are any.
+    function(profile_refuse refusals)
+      if(refusals)
+        list(JOIN refusals "\n  " text)
+        message(FATAL_ERROR "Profile ${PROFILE_NAME} refused:\n  ${text}")
+      endif()
+    endfunction()
+    
+    """#
+  }
+  ["cmake/profile/ProfileToolchain.cmake"] {
+    """
+    # Profile toolchain file. A Profile preset names it and sets PROFILE_<AXIS>
+    # for every name axis; a vcpkg triplet chainloads it with the ABI axes only.
+    # It picks the profile's compiler unless CMAKE_<LANG>_COMPILER is already set,
+    # and starts the flag variables with the flags the profile adds. The check
+    # module then refuses any compiler or flag that differs from the profile.
+    include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+    
+    foreach(axis IN LISTS PROFILE_NAME_AXES)
+      string(TOUPPER "PROFILE_${axis}" var)
+      list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES "${var}")
+    endforeach()
+    list(REMOVE_DUPLICATES CMAKE_TRY_COMPILE_PLATFORM_VARIABLES)
+    
+    if(DEFINED PROFILE_COMPILER AND DEFINED PROFILE_SYSTEM)
+      foreach(lang IN ITEMS C CXX)
+        set(program "PROFILE_COMPILER_${PROFILE_COMPILER}_${lang}_${PROFILE_SYSTEM}")
+        if(NOT DEFINED CMAKE_${lang}_COMPILER AND DEFINED ${program})
+          set(CMAKE_${lang}_COMPILER "${${program}}")
+        endif()
+      endforeach()
+    endif()
+    
+    # import std reads the standard library's modules metadata from the path the
+    # compiler prints for libc++.modules.json. Some LLVM packages, such as
+    # Homebrew's, install it under lib/c++/ where that lookup misses it, so look
+    # there too when the profile asks for import std on a clang.
+    if(PROFILE_IMPORT_STD STREQUAL "importstd_on" AND NOT DEFINED CMAKE_CXX_STDLIB_MODULES_JSON
+        AND "${PROFILE_COMPILER_${PROFILE_COMPILER}_ID}" STREQUAL "Clang" AND DEFINED CMAKE_CXX_COMPILER)
+      foreach(candidate IN ITEMS libc++.modules.json c++/libc++.modules.json)
+        execute_process(COMMAND "${CMAKE_CXX_COMPILER}" "-print-file-name=${candidate}"
+          OUTPUT_VARIABLE found OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET RESULT_VARIABLE failed)
+        if(NOT failed AND IS_ABSOLUTE "${found}" AND EXISTS "${found}")
+          cmake_path(NORMAL_PATH found)
+          set(CMAKE_CXX_STDLIB_MODULES_JSON "${found}")
+          break()
+        endif()
+      endforeach()
+      unset(candidate)
+      unset(found)
+      unset(failed)
+    endif()
+    
+    foreach(lang IN ITEMS C CXX)
+      profile_flags(${lang} compile link)
+      list(JOIN compile " " compile)
+      set(CMAKE_${lang}_FLAGS_INIT "${compile}")
+    endforeach()
+    list(JOIN link " " link)
+    foreach(kind IN ITEMS EXE SHARED MODULE)
+      set(CMAKE_${kind}_LINKER_FLAGS_INIT "${link}")
+    endforeach()
+    unset(compile)
+    unset(link)
+    unset(program)
+    
+    """
+  }
+  ["cmake/profile/ProfileRules.cmake"] {
+    #"""
+    # Profile rules module. A Profile preset loads it before project() through
+    # CMAKE_PROJECT_INCLUDE_BEFORE, so a forbidden combination stops configure
+    # with the catalogue's reasons before the compiler's own checks run. It
+    # refuses an unknown axis value, a PROFILE_NAME that is not the name the values
+    # spell, and any catalogue rule the profile and the build's system, arch,
+    # generator or launcher break. ProfileCheck.cmake checks the build after project().
+    include_guard(GLOBAL)
+    include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+    
+    # Sets <out> to the value paired with <key> in the key-value pairs that follow, or to <key>.
+    function(_profile_lookup key out)
+      set(${out} "${key}" PARENT_SCOPE)
+      while(ARGN)
+        list(POP_FRONT ARGN k v)
+        if(k STREQUAL key)
+          set(${out} "${v}" PARENT_SCOPE)
+          return()
+        endif()
+      endwhile()
+    endfunction()
+    
+    function(_profile_check_rules)
+      set(refusals "")
+      if(NOT PROFILE_NAME)
+        message(FATAL_ERROR "Profile check: PROFILE_NAME is not set; configure through a Profile preset")
+      endif()
+    
+      # Axis values and the name they spell.
+      set(spelled "")
+      foreach(axis IN LISTS PROFILE_NAME_AXES)
+        string(TOUPPER "${axis}" up)
+        set(value "${PROFILE_${up}}")
+        if(axis STREQUAL "sanitizer")
+          profile_sanitizer_members("${value}" members)
+          set(ordered "")
+          foreach(m IN LISTS PROFILE_SANITIZER_MEMBERS)
+            if(m IN_LIST members)
+              list(APPEND ordered "${m}")
+            endif()
+          endforeach()
+          list(JOIN ordered "_" canonical)
+          if(NOT value STREQUAL "none" AND NOT value STREQUAL canonical)
+            list(APPEND refusals "PROFILE_SANITIZER=\"${value}\" is not none or sanitizers from {${PROFILE_SANITIZER_MEMBERS}} in that order")
+          endif()
+        elseif(NOT value IN_LIST PROFILE_AXIS_${axis}_VALUES)
+          list(APPEND refusals "PROFILE_${up}=\"${value}\" is not one of {${PROFILE_AXIS_${axis}_VALUES}}")
+        endif()
+        list(APPEND spelled "${value}")
+      endforeach()
+      list(JOIN spelled "-" name)
+      if(NOT PROFILE_NAME STREQUAL name)
+        list(APPEND refusals "PROFILE_NAME is \"${PROFILE_NAME}\" but the axis values spell \"${name}\"")
+      endif()
+    
+      # Context the build decides.
+      # The toolchain file does not cross-compile, so the host is the target
+      # unless a CMAKE_SYSTEM_NAME was given.
+      set(target "${CMAKE_HOST_SYSTEM_NAME}")
+      if(CMAKE_SYSTEM_NAME)
+        set(target "${CMAKE_SYSTEM_NAME}")
+      endif()
+      _profile_lookup("${target}" system Darwin macos Linux linux)
+      if(NOT system STREQUAL PROFILE_SYSTEM)
+        list(APPEND refusals "the build targets ${target} but the profile names ${PROFILE_SYSTEM}")
+      endif()
+      cmake_host_system_information(RESULT processor QUERY OS_PLATFORM)
+      if(CMAKE_OSX_ARCHITECTURES)
+        set(processor "${CMAKE_OSX_ARCHITECTURES}")
+      endif()
+      string(TOLOWER "${processor}" processor)
+      _profile_lookup("${processor}" context_arch aarch64 arm64 x86_64 amd64)
+      _profile_lookup("${CMAKE_GENERATOR}" context_generator
+        Ninja ninja "Ninja Multi-Config" ninja_multi_config "Unix Makefiles" unix_makefiles Xcode xcode)
+      set(context_launcher "none")
+      if(CMAKE_CXX_COMPILER_LAUNCHER)
+        list(GET CMAKE_CXX_COMPILER_LAUNCHER 0 launcher)
+        get_filename_component(context_launcher "${launcher}" NAME_WE)
+      endif()
+      foreach(axis IN LISTS PROFILE_CONTEXT_AXES)
+        if(NOT context_${axis} IN_LIST PROFILE_AXIS_${axis}_VALUES)
+          list(APPEND refusals "${axis} \"${context_${axis}}\" is not one of {${PROFILE_AXIS_${axis}_VALUES}}")
+        endif()
+      endforeach()
+    
+      # Catalogue rules.
+      profile_sanitizer_members("${PROFILE_SANITIZER}" members)
+      foreach(id IN LISTS PROFILE_RULES)
+        set(all TRUE)
+        foreach(i IN LISTS PROFILE_RULE_${id}_CONDITIONS)
+          set(axis "${PROFILE_RULE_${id}_${i}_AXIS}")
+          if(axis STREQUAL "sanitizers")
+            set(actual "${members}")
+          elseif(axis IN_LIST PROFILE_CONTEXT_AXES)
+            set(actual "${context_${axis}}")
+          else()
+            string(TOUPPER "${axis}" up)
+            set(actual "${PROFILE_${up}}")
+          endif()
+          set(hit FALSE)
+          foreach(v IN LISTS actual)
+            if(v IN_LIST PROFILE_RULE_${id}_${i}_VALUES)
+              set(hit TRUE)
+            endif()
+          endforeach()
+          if(PROFILE_RULE_${id}_${i}_NEGATED)
+            if(hit)
+              set(hit FALSE)
+            else()
+              set(hit TRUE)
+            endif()
+          endif()
+          if(NOT hit)
+            set(all FALSE)
+            break()
+          endif()
+        endforeach()
+        if(all)
+          list(APPEND refusals "${id}: ${PROFILE_RULE_${id}_MESSAGE}")
+        endif()
+      endforeach()
+    
+      profile_refuse("${refusals}")
+    endfunction()
+    
+    _profile_check_rules()
+    
+    """#
+  }
+  ["cmake/profile/ProfileCheck.cmake"] {
+    #"""
+    # Profile check module. A Profile preset loads it after project() through
+    # CMAKE_PROJECT_INCLUDE; ProfileRules.cmake has already checked the axis values
+    # and rules. It stops configure, listing every reason, when:
+    # - a compiler's ID, version or fork commit is not the profile's compiler;
+    # - a CMake setting the profile owns, or a flag its toolchain adds, was overridden;
+    # - the compiler or linker refuses a flag the profile adds, or IPO or
+    #   import std is asked for and unavailable.
+    include_guard(GLOBAL)
+    include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+    include(CheckCompilerFlag)
+    include(CheckLinkerFlag)
+    include(CheckIPOSupported)
+    
+    function(_profile_check_build)
+      set(refusals "")
+      # Compiler identity.
+      get_property(languages GLOBAL PROPERTY ENABLED_LANGUAGES)
+      list(FILTER languages INCLUDE REGEX "^(C|CXX)$")
+      set(expected "PROFILE_COMPILER_${PROFILE_COMPILER}")
+      foreach(lang IN LISTS languages)
+        set(id "${CMAKE_${lang}_COMPILER_ID}")
+        string(REGEX MATCH "^[0-9]+\\.[0-9]+\\.[0-9]+" version "${CMAKE_${lang}_COMPILER_VERSION}")
+        execute_process(COMMAND "${CMAKE_${lang}_COMPILER}" --version
+          OUTPUT_VARIABLE banner ERROR_QUIET RESULT_VARIABLE ignored)
+        set(commit "")
+        if(banner MATCHES "clang-p2996\\.git ([0-9a-f]+)")
+          string(SUBSTRING "${CMAKE_MATCH_1}" 0 8 commit)
+        endif()
+        if(NOT id STREQUAL "${${expected}_ID}" OR NOT version STREQUAL "${${expected}_VERSION}"
+            OR NOT commit STREQUAL "${${expected}_COMMIT}")
+          set(seen "${id} ${version}")
+          if(commit)
+            string(APPEND seen " commit ${commit}")
+          endif()
+          set(want "${${expected}_ID} ${${expected}_VERSION}")
+          if(${expected}_COMMIT)
+            string(APPEND want " commit ${${expected}_COMMIT}")
+          endif()
+          list(APPEND refusals "the ${lang} compiler ${CMAKE_${lang}_COMPILER} is ${seen}, but the profile names ${PROFILE_COMPILER}: ${want}")
+        endif()
+      endforeach()
+    
+      # Settings the profile owns, and the flags its toolchain adds.
+      get_property(multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+      foreach(axis IN LISTS PROFILE_NAME_AXES)
+        string(TOUPPER "${axis}" up)
+        foreach(pair IN LISTS PROFILE_SETTINGS_${axis}_${PROFILE_${up}})
+          string(FIND "${pair}" "=" at)
+          string(SUBSTRING "${pair}" 0 ${at} var)
+          math(EXPR at "${at} + 1")
+          string(SUBSTRING "${pair}" ${at} -1 want)
+          if(var STREQUAL "CMAKE_BUILD_TYPE" AND multi_config)
+            continue()
+          endif()
+          set(same FALSE)
+          if(want STREQUAL "ON" OR want STREQUAL "OFF")
+            if((want AND ${var}) OR (NOT want AND NOT ${var}))
+              set(same TRUE)
+            endif()
+          elseif("${${var}}" STREQUAL want)
+            set(same TRUE)
+          endif()
+          if(NOT same)
+            list(APPEND refusals "${var} is \"${${var}}\" but ${axis} ${PROFILE_${up}} sets \"${want}\"")
+          endif()
+        endforeach()
+      endforeach()
+    
+      set(link "")
+      foreach(lang IN LISTS languages)
+        profile_flags(${lang} compile lang_link)
+        list(APPEND link ${lang_link})
+        separate_arguments(actual NATIVE_COMMAND "${CMAKE_${lang}_FLAGS}")
+        foreach(flag IN LISTS compile)
+          if(NOT flag IN_LIST actual)
+            list(APPEND refusals "CMAKE_${lang}_FLAGS lacks ${flag}, which the profile adds")
+          endif()
+        endforeach()
+        set(CMAKE_REQUIRED_QUIET ON)
+        foreach(flag IN LISTS compile)
+          string(MAKE_C_IDENTIFIER "PROFILE_HAS_${lang}_FLAG_${flag}" result)
+          unset(${result} CACHE)
+          check_compiler_flag(${lang} "${flag}" ${result})
+          if(NOT ${result})
+            list(APPEND refusals "the ${lang} compiler refuses ${flag}")
+          endif()
+        endforeach()
+      endforeach()
+      list(REMOVE_DUPLICATES link)
+      separate_arguments(actual NATIVE_COMMAND "${CMAKE_EXE_LINKER_FLAGS}")
+      foreach(flag IN LISTS link)
+        if(NOT flag IN_LIST actual)
+          list(APPEND refusals "CMAKE_EXE_LINKER_FLAGS lacks ${flag}, which the profile adds")
+        endif()
+        list(GET languages -1 lang)
+        string(MAKE_C_IDENTIFIER "PROFILE_HAS_LINKER_FLAG_${flag}" result)
+        unset(${result} CACHE)
+        check_linker_flag(${lang} "${flag}" ${result})
+        if(NOT ${result})
+          list(APPEND refusals "the linker refuses ${flag}")
+        endif()
+      endforeach()
+    
+      if(PROFILE_IPO STREQUAL "ipo_on")
+        check_ipo_supported(RESULT ipo OUTPUT why LANGUAGES ${languages})
+        if(NOT ipo)
+          list(APPEND refusals "IPO is not supported: ${why}")
+        endif()
+      endif()
+      if(PROFILE_IMPORT_STD STREQUAL "importstd_on")
+        string(REGEX MATCH "[0-9]+" std "${PROFILE_CXX_STANDARD}")
+        if(NOT std IN_LIST CMAKE_CXX_COMPILER_IMPORT_STD)
+          list(APPEND refusals "import std is not available for C++${std}: ${CMAKE_CXX_COMPILER_IMPORT_STD_ERROR_MESSAGE}")
+        elseif(NOT IS_ABSOLUTE "${CMAKE_CXX_STDLIB_MODULES_JSON}" OR NOT EXISTS "${CMAKE_CXX_STDLIB_MODULES_JSON}")
+          list(APPEND refusals "import std needs the standard library modules metadata, but CMAKE_CXX_STDLIB_MODULES_JSON is \"${CMAKE_CXX_STDLIB_MODULES_JSON}\"")
+        endif()
+      endif()
+    
+      profile_refuse("${refusals}")
+      message(STATUS "Profile ${PROFILE_NAME}: checks passed")
+    endfunction()
+    
+    _profile_check_build()
+    
+    """#
+  }
+  ["cmake/profile/triplets/arm64-macos-clang23--1--4-debug-ipo--off-asan--ubsan-none-native-cxx23-c17-gnu--off-importstd--off-refl--off-pch--off.cmake"] {
+    """
+    # Generated by the profile catalogue for profile macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off; do not edit.
+    set(VCPKG_TARGET_ARCHITECTURE arm64)
+    set(VCPKG_CRT_LINKAGE dynamic)
+    set(VCPKG_LIBRARY_LINKAGE static)
+    set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
+    set(VCPKG_OSX_ARCHITECTURES arm64)
+    set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/../ProfileToolchain.cmake")
+    set(VCPKG_CMAKE_CONFIGURE_OPTIONS "-DPROFILE_SYSTEM=macos" "-DPROFILE_COMPILER=clang23_1_4" "-DPROFILE_SANITIZER=asan_ubsan" "-DPROFILE_TARGET_CPU=native" "-DPROFILE_CXX_STANDARD=cxx23" "-DPROFILE_C_STANDARD=c17" "-DCMAKE_CXX_STANDARD=23" "-DCMAKE_CXX_STANDARD_REQUIRED=ON" "-DCMAKE_C_STANDARD=17" "-DCMAKE_C_STANDARD_REQUIRED=ON")
+    set(VCPKG_HASH_ADDITIONAL_FILES
+      "${CMAKE_CURRENT_LIST_DIR}/../ProfileToolchain.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/../ProfileCommon.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/../profile-data.cmake")
+    
+    """
+  }
+  ["cmake/profile/triplets/amd64-linux-clangp2996--f17c8d6c-release-ipo--off-none-none-native-cxx26-c17-gnu--off-importstd--off-refl--on-pch--off.cmake"] {
+    """
+    # Generated by the profile catalogue for profile linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off; do not edit.
+    set(VCPKG_TARGET_ARCHITECTURE x64)
+    set(VCPKG_CRT_LINKAGE dynamic)
+    set(VCPKG_LIBRARY_LINKAGE static)
+    set(VCPKG_CMAKE_SYSTEM_NAME Linux)
+    set(VCPKG_BUILD_TYPE release)
+    set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/../ProfileToolchain.cmake")
+    set(VCPKG_CMAKE_CONFIGURE_OPTIONS "-DPROFILE_SYSTEM=linux" "-DPROFILE_COMPILER=clangp2996_f17c8d6c" "-DPROFILE_SANITIZER=none" "-DPROFILE_TARGET_CPU=native" "-DPROFILE_CXX_STANDARD=cxx26" "-DPROFILE_C_STANDARD=c17" "-DCMAKE_CXX_STANDARD=26" "-DCMAKE_CXX_STANDARD_REQUIRED=ON" "-DCMAKE_C_STANDARD=17" "-DCMAKE_C_STANDARD_REQUIRED=ON")
+    set(VCPKG_HASH_ADDITIONAL_FILES
+      "${CMAKE_CURRENT_LIST_DIR}/../ProfileToolchain.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/../ProfileCommon.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/../profile-data.cmake")
+    
+    """
+  }
+}

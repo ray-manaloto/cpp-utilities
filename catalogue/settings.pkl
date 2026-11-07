@@ -1,0 +1,113 @@
+/// What each axis value sets: CMake's own cache variables, and the compile
+/// and link flags the toolchain file adds.
+module settings
+
+import "axes.pkl"
+
+/// The import std gate that CMake 4.4 requires before `CMAKE_CXX_MODULE_STD` takes effect.
+importStdGate: String = "f35a9ac6-8463-4d38-8eec-5d6008153e7d"
+
+/// CMake cache variables, by axis id and value. Axes missing here set only `PROFILE_<AXIS>`.
+cacheVariables: Map<String, Map<String, Map<String, String>>> = Map(
+  "build_type", Map(
+    "debug", Map("CMAKE_BUILD_TYPE", "Debug"),
+    "release", Map("CMAKE_BUILD_TYPE", "Release"),
+    "relwithdebinfo", Map("CMAKE_BUILD_TYPE", "RelWithDebInfo"),
+    "minsizerel", Map("CMAKE_BUILD_TYPE", "MinSizeRel")
+  ),
+  "ipo", Map(
+    "ipo_on", Map("CMAKE_INTERPROCEDURAL_OPTIMIZATION", "ON"),
+    "ipo_off", Map("CMAKE_INTERPROCEDURAL_OPTIMIZATION", "OFF")
+  ),
+  "cxx_standard", Map(
+    "cxx20", Map("CMAKE_CXX_STANDARD", "20", "CMAKE_CXX_STANDARD_REQUIRED", "ON"),
+    "cxx23", Map("CMAKE_CXX_STANDARD", "23", "CMAKE_CXX_STANDARD_REQUIRED", "ON"),
+    "cxx26", Map("CMAKE_CXX_STANDARD", "26", "CMAKE_CXX_STANDARD_REQUIRED", "ON")
+  ),
+  "c_standard", Map(
+    "c17", Map("CMAKE_C_STANDARD", "17", "CMAKE_C_STANDARD_REQUIRED", "ON"),
+    "c23", Map("CMAKE_C_STANDARD", "23", "CMAKE_C_STANDARD_REQUIRED", "ON")
+  ),
+  "gnu_extensions", Map(
+    "gnu_on", Map("CMAKE_C_EXTENSIONS", "ON", "CMAKE_CXX_EXTENSIONS", "ON"),
+    "gnu_off", Map("CMAKE_C_EXTENSIONS", "OFF", "CMAKE_CXX_EXTENSIONS", "OFF")
+  ),
+  "import_std", Map(
+    "importstd_on", Map("CMAKE_EXPERIMENTAL_CXX_IMPORT_STD", importStdGate, "CMAKE_CXX_MODULE_STD", "ON"),
+    "importstd_off", Map("CMAKE_CXX_MODULE_STD", "OFF")
+  ),
+  "pch", Map(
+    "pch_on", Map("CMAKE_DISABLE_PRECOMPILE_HEADERS", "OFF"),
+    "pch_off", Map("CMAKE_DISABLE_PRECOMPILE_HEADERS", "ON")
+  )
+)
+
+/// One row of the flag table. It applies when the profile holds `value` on
+/// `axis` (for `sanitizers`, when the set holds it) and, if `compilers` is not
+/// empty, the profile's compiler is one of them.
+class Flag {
+  axis: String
+  value: String
+  compilers: List<axes.Compiler> = List()
+  languages: List<"C"|"CXX"> = List("C", "CXX")
+  compile: List<String> = List()
+  link: List<String> = List()
+}
+
+local function sanitizer(member: axes.Sanitizer, fsanitize: String, extra: List<String>): Flag = new {
+  axis = "sanitizers"
+  value = member
+  compile = List("-fsanitize=\(fsanitize)", "-fno-omit-frame-pointer") + extra
+  link = List("-fsanitize=\(fsanitize)")
+}
+
+local function march(cpu: axes.TargetCpu, arch: String): Flag = new {
+  axis = "target_cpu"
+  value = cpu
+  compile = List("-march=\(arch)")
+}
+
+flags: List<Flag> = List(
+  sanitizer("asan", "address", List()),
+  sanitizer("ubsan", "undefined", List()),
+  sanitizer("lsan", "leak", List()),
+  sanitizer("tsan", "thread", List()),
+  sanitizer("msan", "memory", List("-fsanitize-memory-track-origins")),
+  sanitizer("hwasan", "hwaddress", List()),
+  sanitizer("rtsan", "realtime", List()),
+  sanitizer("tysan", "type", List()),
+  sanitizer("nsan", "numerical", List()),
+  new Flag {
+    axis = "instrumentation"
+    value = "xray"
+    compile = List("-fxray-instrument")
+    link = List("-fxray-instrument")
+  },
+  new Flag {
+    axis = "instrumentation"
+    value = "bolt"
+    link = List("-Wl,--emit-relocs")
+  },
+  march("native", "native"),
+  march("znver2", "znver2"),
+  march("noavx", "x86-64-v2"),
+  march("arm64", "armv8-a"),
+  new Flag {
+    axis = "reflection"
+    value = "refl_on"
+    compilers = List("gcc16_2_0")
+    languages = List("CXX")
+    compile = List("-freflection")
+  },
+  new Flag {
+    axis = "reflection"
+    value = "refl_on"
+    compilers = List("clangp2996_f17c8d6c")
+    languages = List("CXX")
+    compile = List("-freflection", "-fexpansion-statements")
+  }
+)
+
+/// Compilers that have reflection: the ones a `refl_on` flag row names.
+reflectionCompilers: List<axes.Compiler> =
+  flags.filter((f) -> f.axis == "reflection" && f.value == "refl_on").flatMap((f) -> f.compilers)

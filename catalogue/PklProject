@@ -1,0 +1,11 @@
+amends "pkl:Project"
+
+package {
+  name = "profile-catalogue"
+  baseUri = "package://pkg.pkl-lang.org/github.com/ray-manaloto/cpp-utilities/\(name)"
+  version = "0.1.0"
+  packageZipUrl = "https://github.com/ray-manaloto/cpp-utilities/releases/download/\(name)@\(version)/\(name)@\(version).zip"
+  description = "Build profile catalogue: axes as enums, refusal rules, and renderers for CMake preset shards, toolchain files, vcpkg overlay triplets and a configure check module."
+  sourceCode = "https://github.com/ray-manaloto/cpp-utilities"
+  issueTracker = "https://github.com/ray-manaloto/cpp-utilities/issues"
+}
