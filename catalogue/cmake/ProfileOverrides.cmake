@@ -55,6 +55,14 @@ endfunction()
 # Flags a project adds itself, such as with add_compile_options, are not seen,
 # nor is turning off one check of a group, such as -fno-sanitize=alignment
 # under -fsanitize=undefined.
+# Flags the check cannot read are refused whole: an argument starting with '@'
+# (a response file) and clang's --config, --config=<file>, --config-system-dir=
+# and --config-user-dir= (configuration files), as any of them may hold a flag
+# that undoes one. Reading those files here would mean matching the compilers'
+# quoting, nesting and relative-path rules exactly. -Wl,@<file> is let through:
+# it goes to the linker, which does not read -fsanitize or -fno-sanitize.
+# CCC_OVERRIDE_OPTIONS, an environment variable that edits clang's arguments,
+# is a known gap: the check does not see the environment.
 function(_profile_undone required vars out)
   set(refusals "")
   string(ASCII 1 semicolon)
@@ -63,6 +71,11 @@ function(_profile_undone required vars out)
   foreach(var IN LISTS vars)
     _profile_tokens("${${var}}" tokens)
     foreach(token IN LISTS tokens)
+      if(token MATCHES "^@")
+        list(APPEND refusals "${var} has ${token}, a response file the check can't read")
+      elseif(token MATCHES "^--config(-system-dir|-user-dir)?(=|$)")
+        list(APPEND refusals "${var} has ${token}, a configuration file the check can't read")
+      endif()
       list(APPEND tokens_in_order "${token}")
       list(APPEND token_vars "${var}")
     endforeach()

@@ -83,6 +83,13 @@ expect 'CMAKE_CXX_FLAGS_DEBUG has -march=armv8.5-a after -march=native, which th
   -DCMAKE_CXX_FLAGS_DEBUG="-g -march=armv8.5-a"
 expect 'CMAKE_CXX_FLAGS_DEBUG turns off sanitizer address, which the profile turns on' "$asan" \
   -DCMAKE_CXX_FLAGS="-DLBRACKET=[ $base" -DCMAKE_CXX_FLAGS_DEBUG=-fno-sanitize=all
+# Empty files for the flags below to name, so the compiler test passes.
+: >"$work/flags.rsp"
+: >"$work/x.cfg"
+expect "CMAKE_CXX_FLAGS_DEBUG has @$work/flags.rsp, a response file the check can't read" "$asan" \
+  -DCMAKE_CXX_FLAGS_DEBUG="-g @$work/flags.rsp"
+expect "CMAKE_EXE_LINKER_FLAGS has --config=$work/x.cfg, a configuration file the check can't read" "$asan" \
+  -DCMAKE_EXE_LINKER_FLAGS="--config=$work/x.cfg"
 
 # accept <what> <preset> [cmake args...]: configure must pass.
 accept() {
@@ -102,6 +109,7 @@ accept() {
 accept 'turning off a sanitizer the profile lacks' "$asan" -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=leak"
 accept 'a quoted semicolon in a flag' "$asan" -DCMAKE_CXX_FLAGS="$base -DSEP=\"a;b\""
 accept 'an unmatched bracket in a flag' "$asan" -DCMAKE_CXX_FLAGS="-DLBRACKET=[ $base"
+accept 'an @ inside a word' "$asan" -DCMAKE_CXX_FLAGS="$base -DEMAIL=a@b"
 accept 'turning a profile sanitizer off and on again' "$asan" \
   -DCMAKE_CXX_FLAGS_DEBUG="-g -fno-sanitize=address -fsanitize=address"
 

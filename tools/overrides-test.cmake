@@ -59,6 +59,25 @@ check("refuses a weaker level after the written-out level in place of the bare f
   "-fsanitize=memory -fsanitize-memory-track-origins=2" "-fsanitize-memory-track-origins=0"
   "CMAKE_CXX_FLAGS_DEBUG has -fsanitize-memory-track-origins=0 after -fsanitize-memory-track-origins, which the profile adds")
 
+check("refuses a response file in the base variable" "-fsanitize=address"
+  "-fsanitize=address @/abs/flags.rsp" "-g"
+  "CMAKE_CXX_FLAGS has @/abs/flags.rsp, a response file the check can't read")
+check("refuses a response file in a configuration's variable" "-fsanitize=address"
+  "-fsanitize=address" "-g @/abs/flags.rsp"
+  "CMAKE_CXX_FLAGS_DEBUG has @/abs/flags.rsp, a response file the check can't read")
+check("refuses --config=<file>" "-fsanitize=address"
+  "-fsanitize=address" "--config=/abs/x.cfg"
+  "CMAKE_CXX_FLAGS_DEBUG has --config=/abs/x.cfg, a configuration file the check can't read")
+check("refuses --config <file> as two tokens" "-fsanitize=address"
+  "-fsanitize=address --config /abs/x.cfg" "-g"
+  "CMAKE_CXX_FLAGS has --config, a configuration file the check can't read")
+check("refuses the directories that decide which configuration files clang reads" "-fsanitize=address"
+  "-fsanitize=address --config-user-dir=/abs" "--config-system-dir=/abs"
+  "CMAKE_CXX_FLAGS has --config-user-dir=/abs, a configuration file the check can't read;CMAKE_CXX_FLAGS_DEBUG has --config-system-dir=/abs, a configuration file the check can't read")
+check("accepts an @ inside a word" "-fsanitize=address"
+  "-fsanitize=address -DEMAIL=a@b" "-g -Wl,@/abs/link.rsp -DCONFIG=--config"
+  "")
+
 if(failures)
   message(FATAL_ERROR "${failures} override check case(s) failed")
 endif()
