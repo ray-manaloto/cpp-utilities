@@ -12,6 +12,7 @@ importstd=fixture-macos-clang23_1_4-release-ipo_on-none-none-native-cxx23-c17-gn
 gcc=fixture-macos-gcc16_2_0-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on
 gcc_ipo_name=macos-gcc16_2_0-release-ipo_on-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on
 refl_name=macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_on-pch_off
+gcc_ubsan_name=macos-gcc16_2_0-release-ipo_off-ubsan-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_on
 asan_tsan_name=macos-clang23_1_4-debug-ipo_off-asan_tsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off
 
 # A launcher named sccache that runs the compiler unchanged.
@@ -58,6 +59,7 @@ expect 'PROFILE_SANITIZER="ubsan_asan" is not none or sanitizers from' "$asan" -
 expect 'sanitizer_tsan_asan:' "$asan" -DPROFILE_SANITIZER=asan_tsan -DPROFILE_NAME="$asan_tsan_name"
 expect 'importstd_generator:' "$importstd" -G "Unix Makefiles"
 expect 'pch_sccache:' "$gcc" -DCMAKE_CXX_COMPILER_LAUNCHER="$work/bin/sccache"
+expect 'sanitizer_gcc_macos:' "$gcc" -DPROFILE_SANITIZER=ubsan -DPROFILE_NAME="$gcc_ubsan_name"
 expect 'reflection_compiler:' "$asan" -DPROFILE_REFLECTION=refl_on -DPROFILE_NAME="$refl_name"
 expect 'IPO is not supported' "$gcc" -DPROFILE_IPO=ipo_on -DPROFILE_NAME="$gcc_ipo_name"
 expect 'is Clang 21.0.0 commit 0badc0de, but the profile names clangp2996_f17c8d6c' "$p2996" \

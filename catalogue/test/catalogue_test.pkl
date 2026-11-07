@@ -27,6 +27,7 @@ local witnesses: Map<String, profile.Profile> = Map(
   "sanitizer_hwasan_arch", (linux("clang23_1_4")) { sanitizers = Set("hwasan") },
   "sanitizer_nsan_arch", (linux("clang23_1_4")) { arch = "arm64"; targetCpu = "arm64"; sanitizers = Set("nsan") },
   "sanitizer_macos", (mac("clang23_1_4")) { sanitizers = Set("asan") },
+  "sanitizer_gcc_macos", (mac("gcc16_2_0")) { sanitizers = Set("ubsan") },
   "xray_clang", (linux("gcc16_2_0")) { instrumentation = "xray" },
   "xray_macos", (mac("clang23_1_4")) { instrumentation = "xray" },
   "bolt_macos", (mac("clang23_1_4")) { instrumentation = "bolt" },
@@ -106,6 +107,14 @@ facts {
   }
   ["context axes change the rules but not the name"] {
     (linux("gcc16_2_0")) { launcher = "sccache"; generator = "unix_makefiles" }.name == linux("gcc16_2_0").name
+  }
+  ["gcc on macos refuses every sanitizer, with a message that says why"] {
+    List("ubsan", "asan").every((s) -> refusedIds((mac("gcc16_2_0")) { sanitizers = Set(s) }).contains("sanitizer_gcc_macos"))
+    refusedIds((mac("gcc16_2_0")) { sanitizers = Set("asan", "ubsan") }).contains("sanitizer_gcc_macos")
+    test.catch(() -> (mac("gcc16_2_0")) { sanitizers = Set("ubsan") }.validated).contains("libubsan")
+    // Only the sanitizers are refused: gcc on macos without one, and gcc on linux with one, pass.
+    refusedIds(mac("gcc16_2_0")).isEmpty
+    refusedIds((linux("gcc16_2_0")) { sanitizers = Set("ubsan", "asan") }).isEmpty
   }
   ["a refused profile throws every refusal"] {
     let (msg = test.catch(() -> (mac("gcc14_2_0")) { instrumentation = "bolt"; sanitizers = Set("tsan") }.validated))

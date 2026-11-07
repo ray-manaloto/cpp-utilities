@@ -35,6 +35,7 @@ local compilerSystemRules: List<Rule> =
           oneOf("compiler", List(k)), noneOf("system", systems))))
 
 local clangOnly: List<String> = compilers.clangFamily
+local gnuOnly: List<String> = compilers.gnuFamily
 
 rules: List<Rule> = compilerSystemRules + List(
   // Sanitizers that cannot share a process.
@@ -49,6 +50,10 @@ rules: List<Rule> = compilerSystemRules + List(
   // macOS runs only ubsan, and asan with ubsan; the rest run on Linux.
   rule("sanitizer_macos", "macos allows only the sanitizers ubsan, and asan with ubsan", List(
     oneOf("system", List("macos")), noneOf("sanitizer", List("none", "ubsan", "asan_ubsan")))),
+  // The conda and Homebrew g++ on macOS ship no libasan or libubsan, so the
+  // compiler test fails at link time with `library not found for -lubsan`.
+  rule("sanitizer_gcc_macos", "gcc on macos has no libasan or libubsan, so it runs no sanitizer", List(
+    oneOf("system", List("macos")), oneOf("compiler", gnuOnly), noneOf("sanitizer", List("none")))),
 
   // Instrumentation.
   rule("xray_clang", "xray needs a clang compiler", List(oneOf("instrumentation", List("xray")), noneOf("compiler", clangOnly))),
