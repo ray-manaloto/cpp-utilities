@@ -7,6 +7,8 @@ here=$(cd "$(dirname "$0")/.." && pwd -P)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 fail=0
+# Git hooks in the clones run mise, which refuses an untrusted mise.toml.
+export MISE_TRUSTED_CONFIG_PATHS="$work${MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}"
 
 clone() {
   rm -rf "$work/c"

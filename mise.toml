@@ -54,6 +54,18 @@ run = "tools/fixture-build.sh"
 description = "Check configure refuses ruled overrides (macOS)"
 run = "tools/fixture-refusals.sh"
 
+[tasks."registry:check"]
+description = "Fail if the registry's ports and versions disagree"
+run = "tools/registry-check.sh"
+
+[tasks."registry:test"]
+description = "Check registry:check refuses a stale or missing version entry (needs the registry committed)"
+run = "tools/registry-test.sh"
+
+[tasks."registry:consume"]
+description = "Install the registry's ports through a pinned manifest and build against them (needs the registry committed)"
+run = "tools/registry-consume.sh"
+
 [tasks.check]
 description = "Run every check"
-depends = ["test", "fixture:fresh", "fixture:schema", "fixture:build", "fixture:refusals"]
+depends = ["test", "fixture:fresh", "fixture:schema", "fixture:build", "fixture:refusals", "registry:check", "registry:test", "registry:consume"]
