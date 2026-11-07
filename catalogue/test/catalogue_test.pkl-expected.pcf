@@ -607,6 +607,9 @@ examples {
           "name": "profile-base",
           "hidden": true,
           "toolchainFile": "${sourceDir}/cmake/profile/ProfileToolchain.cmake",
+          "environment": {
+            "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/profile/ProfileToolchain.cmake"
+          },
           "cacheVariables": {
             "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/cmake/profile/ProfileRules.cmake",
             "CMAKE_PROJECT_INCLUDE": "${sourceDir}/cmake/profile/ProfileCheck.cmake"
@@ -631,6 +634,9 @@ examples {
             "reflection-refl_off",
             "pch-pch_off"
           ],
+          "environment": {
+            "PROFILE_PRESET": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
+          },
           "cacheVariables": {
             "PROFILE_NAME": "macos-clang23_1_4-debug-ipo_off-asan_ubsan-none-native-cxx23-c17-gnu_off-importstd_off-refl_off-pch_off"
           }
@@ -654,6 +660,9 @@ examples {
             "reflection-refl_on",
             "pch-pch_off"
           ],
+          "environment": {
+            "PROFILE_PRESET": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
+          },
           "cacheVariables": {
             "PROFILE_NAME": "linux-clangp2996_f17c8d6c-release-ipo_off-none-none-native-cxx26-c17-gnu_off-importstd_off-refl_on-pch_off"
           }
@@ -1107,6 +1116,19 @@ examples {
     # and starts the flag variables with the flags the profile adds. The check
     # module then refuses any compiler or flag that differs from the profile.
     include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+    
+    # A Profile preset sets PROFILE_PRESET in the environment as well as PROFILE_* in
+    # the cache. A changed compiler makes CMake delete the cache and configure again
+    # without the preset's cache variables: no PROFILE_* is left, and with it go the
+    # rules module and the check module. The environment survives, so a build that
+    # has the preset's name but none of its values stops here instead of running
+    # unchecked. (A vcpkg triplet passes the ABI axes, so PROFILE_COMPILER is set there.)
+    if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER)
+      message(FATAL_ERROR "Profile $ENV{PROFILE_PRESET}: the build directory lost the profile. "
+        "Changing CMAKE_C_COMPILER or CMAKE_CXX_COMPILER on an existing build directory makes "
+        "CMake delete its cache, and the profile's values and checks with it. "
+        "Delete the build directory and configure the preset again.")
+    endif()
     
     foreach(axis IN LISTS PROFILE_NAME_AXES)
       string(TOUPPER "PROFILE_${axis}" var)

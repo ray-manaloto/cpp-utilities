@@ -77,6 +77,10 @@ function profilesFile(profiles: List<profile.Profile>, cmakeDir: String): Map<St
     "name", profileBase,
     "hidden", true,
     "toolchainFile", "\(cmakeDir)/ProfileToolchain.cmake",
+    // The environment outlives the cache. A changed compiler makes CMake delete the
+    // cache and configure again from the command line alone, so the toolchain file
+    // is named here too and finds `PROFILE_PRESET` set where `PROFILE_*` is gone.
+    "environment", Map("CMAKE_TOOLCHAIN_FILE", "\(cmakeDir)/ProfileToolchain.cmake"),
     "cacheVariables", Map(
       "CMAKE_PROJECT_INCLUDE_BEFORE", "\(cmakeDir)/ProfileRules.cmake",
       "CMAKE_PROJECT_INCLUDE", "\(cmakeDir)/ProfileCheck.cmake")
@@ -84,6 +88,7 @@ function profilesFile(profiles: List<profile.Profile>, cmakeDir: String): Map<St
     "name", p.name,
     "hidden", true,
     "inherits", List(profileBase) + axes.nameAxes.map((a) -> axisPreset(a, p.values[a])),
+    "environment", Map("PROFILE_PRESET", p.name),
     "cacheVariables", Map("PROFILE_NAME", p.name)
   )),
   "testPresets", profiles.map((p) -> Map(

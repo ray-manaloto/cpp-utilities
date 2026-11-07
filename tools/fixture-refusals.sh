@@ -66,6 +66,24 @@ expect 'is Clang 21.0.0 commit 0badc0de, but the profile names clangp2996_f17c8d
   -DCMAKE_C_COMPILER="$work/bin/clang-p2996" -DCMAKE_CXX_COMPILER="$work/bin/clang++-p2996"
 expect 'PROFILE_NAME is not set' "$asan" -DPROFILE_NAME=
 
+# Reconfiguring an existing directory with another compiler makes CMake delete
+# the cache, and the profile's variables with it. The check must still run.
+n=$((n + 1))
+if ! cmake --preset "$asan" -B "$work/b$n" >"$work/log$n" 2>&1; then
+  echo "FAIL $n: the first configure of the reconfigure case failed"
+  sed 's/^/     /' "$work/log$n" | tail -20
+  failures=$((failures + 1))
+elif cmake --preset "$asan" -B "$work/b$n" -DCMAKE_C_COMPILER=gcc-16 -DCMAKE_CXX_COMPILER=g++-16 >"$work/relog$n" 2>&1; then
+  echo "FAIL $n: a reconfigure with another compiler passed without a profile check"
+  failures=$((failures + 1))
+elif tr -s ' \n' ' ' <"$work/relog$n" | grep -qF -- 'the build directory lost the profile'; then
+  echo "ok   $n: a reconfigure that deletes the cache is refused"
+else
+  echo "FAIL $n: the reconfigure failed without the lost-profile reason"
+  sed 's/^/     /' "$work/relog$n" | tail -20
+  failures=$((failures + 1))
+fi
+
 # Overrides that keep every flag the profile adds but undo one of them later:
 # in the same variable, in a configuration's variable, or at link time.
 base='-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -march=native'

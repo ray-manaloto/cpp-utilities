@@ -5,6 +5,19 @@
 # module then refuses any compiler or flag that differs from the profile.
 include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
 
+# A Profile preset sets PROFILE_PRESET in the environment as well as PROFILE_* in
+# the cache. A changed compiler makes CMake delete the cache and configure again
+# without the preset's cache variables: no PROFILE_* is left, and with it go the
+# rules module and the check module. The environment survives, so a build that
+# has the preset's name but none of its values stops here instead of running
+# unchecked. (A vcpkg triplet passes the ABI axes, so PROFILE_COMPILER is set there.)
+if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER)
+  message(FATAL_ERROR "Profile $ENV{PROFILE_PRESET}: the build directory lost the profile. "
+    "Changing CMAKE_C_COMPILER or CMAKE_CXX_COMPILER on an existing build directory makes "
+    "CMake delete its cache, and the profile's values and checks with it. "
+    "Delete the build directory and configure the preset again.")
+endif()
+
 foreach(axis IN LISTS PROFILE_NAME_AXES)
   string(TOUPPER "PROFILE_${axis}" var)
   list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES "${var}")

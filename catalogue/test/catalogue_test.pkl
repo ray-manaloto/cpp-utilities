@@ -10,6 +10,7 @@ import "../compilers.pkl"
 import "../profile.pkl"
 import "../rules.pkl"
 import "../settings.pkl"
+import "../render/presets.pkl"
 import "../render/triplets.pkl"
 
 local function mac(c: axes.Compiler): profile.Profile = new { system = "macos"; compiler = c }
@@ -135,6 +136,11 @@ facts {
       && emitted.containsKey("cmake/profile/ProfileToolchain.cmake")
       && emitted.containsKey("cmake/profile/ProfileCommon.cmake")
       && emitted.containsKey("cmake/profile/profile-data.cmake")
+  }
+  ["a profile preset keeps its identity and toolchain file in the environment, which a deleted cache leaves"] {
+    let (file = presets.profilesFile(valid, "D"))
+      file["configurePresets"].first["environment"] == Map("CMAKE_TOOLCHAIN_FILE", "D/ProfileToolchain.cmake")
+      && file["configurePresets"].drop(1).every((c) -> c["environment"] == Map("PROFILE_PRESET", c["name"]))
   }
   ["a triplet hashes the files that build a dependency, not the override check"] {
     let (triplet = triplets.text(valid.first))
