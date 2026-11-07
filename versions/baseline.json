@@ -1,0 +1,8 @@
+{
+  "default": {
+    "gch-small-vector": {
+      "baseline": "0.10.2",
+      "port-version": 0
+    }
+  }
+}

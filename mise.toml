@@ -8,6 +8,26 @@ cmake = "4.4.5"
 ninja = "1.13.2"
 "pipx:check-jsonschema" = "0.38.2"
 
+# vcpkg checks the registry (ports/ and versions/) and builds its ports in the consumer test. It is the
+# same tool, with the standalone bundle laid over the release binary, that a project consuming the registry pins.
+[tools."github:microsoft/vcpkg-tool"]
+version = "2026-10-29"
+additional_asset_patterns = ["vcpkg-standalone-bundle.tar.gz"]
+rename_exe = "vcpkg"
+
+[tools."github:microsoft/vcpkg-tool".platforms.macos-arm64]
+asset_pattern = "vcpkg-macos"
+
+[tools."github:microsoft/vcpkg-tool".platforms.linux-x64]
+asset_pattern = "vcpkg-glibc"
+
+[tools."github:microsoft/vcpkg-tool".platforms.linux-arm64]
+asset_pattern = "vcpkg-glibc-arm64"
+
+[env]
+VCPKG_ROOT = { value = "{{ tools['github:microsoft/vcpkg-tool'].path }}", tools = true }
+VCPKG_DISABLE_METRICS = "1"
+
 [tasks.test]
 description = "Run the catalogue's pkl tests"
 dir = "catalogue"

@@ -6,18 +6,11 @@ vcpkg_from_github(
     HEAD_REF main
 )
 
-# One header: the debug build has nothing to add.
+# One header, nothing to compile: install it and a CMake config of our own. A registry's ports can
+# depend only on ports in the registry, so this does not use vcpkg-cmake, a builtin port.
 set(VCPKG_BUILD_TYPE release)
 
-vcpkg_cmake_configure(
-    SOURCE_PATH "${SOURCE_PATH}"
-    OPTIONS
-        -DGCH_SMALL_VECTOR_ENABLE_TESTS=OFF
-        -DGCH_SMALL_VECTOR_ENABLE_BENCHMARKS=OFF
-)
-vcpkg_cmake_install()
-vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/small_vector)
-
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/share/licenses")
+file(INSTALL "${SOURCE_PATH}/source/include/gch" DESTINATION "${CURRENT_PACKAGES_DIR}/include")
+file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/small_vector-config.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/small_vector")
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
