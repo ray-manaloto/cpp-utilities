@@ -1,0 +1,7 @@
+{
+  "name": "gch-small-vector",
+  "version": "0.10.2",
+  "description": "A vector container with a small buffer optimization, in one header.",
+  "homepage": "https://github.com/gharveymn/small_vector",
+  "license": "MIT"
+}

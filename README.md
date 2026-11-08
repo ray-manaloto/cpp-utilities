@@ -70,4 +70,41 @@ the check module refuses one whose version doesn't match the profile.
 | `mise run fixture:schema` | validates the generated presets against CMake's presets schema |
 | `mise run fixture:build` | configures, builds and tests each fixture preset this machine can run |
 | `mise run fixture:refusals` | checks that configure refuses ruled overrides (macOS) |
+| `mise run registry:check` | fails if `ports/` and `versions/` disagree (vcpkg's own verifier) |
+| `mise run registry:test` | checks that `registry:check` refuses a stale or missing version entry |
+| `mise run registry:consume` | installs the ports through a manifest pinned to HEAD and builds against them |
 | `mise run check` | all of the above |
+
+## vcpkg registry
+
+This repository is also a vcpkg git registry: `ports/` holds the ports and
+`versions/` their version database. The first port is `gch-small-vector`.
+
+### Use
+
+Pin the registry in your `vcpkg-configuration.json`. `baseline` is a commit of
+this repository; `reference` limits which ref vcpkg follows.
+
+```json
+{
+  "registries": [
+    {
+      "kind": "git",
+      "repository": "https://github.com/ray-manaloto/cpp-utilities",
+      "baseline": "<commit sha>",
+      "reference": "<branch or tag the commit is on>",
+      "packages": ["gch-small-vector"]
+    }
+  ]
+}
+```
+
+### Release a port version
+
+1. Add or change the port under `ports/<name>/`; bump `version` or `port-version`.
+2. Commit it, then run `vcpkg x-add-version --all` with the pinned vcpkg and commit
+   the `versions/` changes. A version entry holds the git tree of the port's
+   directory, so the port must not change after its entry is recorded.
+3. `mise run registry:check`, `registry:test` and `registry:consume` pass.
+4. Tag the commit `vcpkg-registry@<x.y.z>` and publish a release. Consumers move
+   `baseline` to a commit on that tag.
