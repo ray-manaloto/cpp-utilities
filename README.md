@@ -92,6 +92,7 @@ this repository; `reference` limits which ref vcpkg follows.
       "kind": "git",
       "repository": "https://github.com/ray-manaloto/cpp-utilities",
       "baseline": "<commit sha>",
+      "reference": "<branch or tag the commit is on>",
       "packages": ["gch-small-vector"]
     }
   ]
