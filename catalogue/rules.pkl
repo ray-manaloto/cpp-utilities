@@ -76,7 +76,11 @@ rules: List<Rule> = compilerSystemRules + List(
     oneOf("import_std", List("importstd_on")), noneOf("generator", List("ninja", "ninja_multi_config")))),
   rule("importstd_standard", "import std needs cxx23 or later", List(oneOf("import_std", List("importstd_on")), oneOf("cxx_standard", List("cxx20")))),
 
-  // Precompiled headers.
-  rule("pch_sccache", "pch is refused on gcc16_2_0 under sccache", List(
-    oneOf("pch", List("pch_on")), oneOf("compiler", List("gcc16_2_0")), oneOf("launcher", List("sccache"))))
+  // Precompiled headers. sccache cannot see a macro change inside a GCC precompiled
+  // header: the -E output is unchanged, so it serves stale objects (mozilla/sccache#2562,
+  // open and unfixed in v0.19.0; see also #615). ccache has the same GCC limitation
+  // (ccache/ccache#1668, #1686), and LLVM turns PCH off under sccache for the same
+  // reason (llvm/llvm-project#176420). Clang is allowed.
+  rule("pch_sccache", "pch is refused on GCC under sccache", List(
+    oneOf("pch", List("pch_on")), oneOf("compiler", gnuOnly), oneOf("launcher", List("sccache"))))
 )

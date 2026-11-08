@@ -117,6 +117,12 @@ facts {
     refusedIds(mac("gcc16_2_0")).isEmpty
     refusedIds((linux("gcc16_2_0")) { sanitizers = Set("ubsan", "asan") }).isEmpty
   }
+  ["pch under sccache is refused on every gcc and allowed on clang"] {
+    List("gcc14_2_0", "gcc16_2_0").every((c) -> refusedIds((linux(c)) { pch = "pch_on"; launcher = "sccache" }).contains("pch_sccache"))
+    List("clang23_1_4", "clangp2996_f17c8d6c").every((c) -> !refusedIds((linux(c)) { pch = "pch_on"; launcher = "sccache" }).contains("pch_sccache"))
+    !refusedIds((linux("gcc14_2_0")) { pch = "pch_on"; launcher = "ccache" }).contains("pch_sccache")
+    !refusedIds((linux("gcc14_2_0")) { launcher = "sccache" }).contains("pch_sccache")
+  }
   ["a refused profile throws every refusal"] {
     let (msg = test.catch(() -> (mac("gcc14_2_0")) { instrumentation = "bolt"; sanitizers = Set("tsan") }.validated))
       msg.contains("compiler_system_gcc14_2_0") && msg.contains("bolt_macos") && msg.contains("sanitizer_macos")
