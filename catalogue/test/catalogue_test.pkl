@@ -54,10 +54,30 @@ local valid: List<profile.Profile> = List(
   (linux("clang23_1_4")) { sanitizers = Set("tsan"); targetCpu = "noavx" },
   (linux("clang23_1_4")) { sanitizers = Set("msan"); instrumentation = "xray" },
   (linux("clang23_1_4")) { arch = "arm64"; targetCpu = "arm64"; sanitizers = Set("hwasan") },
-  (linux("clang23_1_4")) { sanitizers = Set("nsan", "rtsan", "tysan"); instrumentation = "bolt" }
+  (linux("clang23_1_4")) { sanitizers = Set("nsan", "rtsan", "tysan"); instrumentation = "bolt" },
+  (mac("clang23_1_5")) { buildType = "debug"; sanitizers = Set("ubsan", "asan") },
+  (linux("clang23_1_5")) { sanitizers = Set("msan"); instrumentation = "xray" },
+  (mac("clangp2996_562409c7")) { cxxStandard = "cxx26"; reflection = "refl_on" },
+  (linux("clangp2996_562409c7")) { cxxStandard = "cxx26"; reflection = "refl_on"; sanitizers = Set("rtsan") }
 )
 
 local allAxes: List<String> = axes.nameAxes + axes.contextAxes
+
+/// The first line `clang++-p2996 --version` prints for the fork build at
+/// commit 562409c7. `clangp2996_562409c7` must spell the version and commit it reports.
+local p2996Banner562409c7 =
+  "clang version 21.0.0git (https://github.com/bloomberg/clang-p2996.git 562409c7942690d59ea470762515f88f24b16e23)"
+
+/// The upstream version and the eight-digit commit a clang-p2996 banner reports.
+local function bannerIdentity(banner: String): Pair<String, String> =
+  let (m = Regex(#"clang version (\d+\.\d+\.\d+)\S* \(\S*clang-p2996\.git ([0-9a-f]{8})[0-9a-f]*\)"#).matchEntire(banner)!!)
+    Pair(m.groups[1]!!.value, m.groups[2]!!.value)
+
+/// Each newer compiler value and the value it succeeds.
+local successors: Map<axes.Compiler, axes.Compiler> = Map(
+  "clang23_1_5", "clang23_1_4",
+  "clangp2996_562409c7", "clangp2996_f17c8d6c"
+)
 
 facts {
   ["every axis list is distinct and every axis has values"] {
@@ -71,6 +91,30 @@ facts {
     !("cxx17" is axes.CxxStandard)
     !("coverage" is axes.Instrumentation)
     "clangp2996_f17c8d6c" is axes.Compiler
+    "clang23_1_5" is axes.Compiler
+    "clangp2996_562409c7" is axes.Compiler
+  }
+  ["clang 23.1.5 and clang-p2996 562409c7 are in the Clang family"] {
+    List("clang23_1_4", "clang23_1_5", "appleclang21_0_0", "clangp2996_f17c8d6c", "clangp2996_562409c7")
+      .every((c) -> compilers.clangFamily.contains(c))
+    !compilers.clangFamily.contains("gcc16_2_0")
+  }
+  ["each newer compiler names the programs of the value it succeeds"] {
+    successors.keys.every((k) -> compilers.compilers.containsKey(k) && compilers.compilers.containsKey(successors[k]))
+    successors.keys.every((k) ->
+      compilers.compilers[k].c == compilers.compilers[successors[k]].c
+      && compilers.compilers[k].cxx == compilers.compilers[successors[k]].cxx)
+  }
+  ["clang23_1_5 is upstream Clang 23.1.5"] {
+    compilers.compilers["clang23_1_5"].id == "Clang"
+    compilers.compilers["clang23_1_5"].version == "23.1.5"
+    compilers.compilers["clang23_1_5"].commit == null
+  }
+  ["clangp2996_562409c7 spells the version and commit its clang++ --version reports"] {
+    bannerIdentity(p2996Banner562409c7) == Pair("21.0.0", "562409c7")
+    compilers.compilers["clangp2996_562409c7"].id == "Clang"
+    Pair(compilers.compilers["clangp2996_562409c7"].version, compilers.compilers["clangp2996_562409c7"].commit)
+      == bannerIdentity(p2996Banner562409c7)
   }
   ["each compiler's axis value spells its identity"] {
     compilers.compilers.keys.every((k) -> compilers.compilers[k].value == k)
@@ -95,7 +139,7 @@ facts {
     (linux("clangp2996_f17c8d6c")) { cxxStandard = "cxx26"; reflection = "refl_on" }.refusals.isEmpty
   }
   ["reflection belongs to the compilers whose flag rows add it"] {
-    settings.reflectionCompilers == List("gcc16_2_0", "clangp2996_f17c8d6c")
+    settings.reflectionCompilers == List("gcc16_2_0", "clangp2996_f17c8d6c", "clangp2996_562409c7")
   }
   ["a name spells every name axis, defaults included, with sanitizers in axis order"] {
     (mac("clang23_1_4")) { sanitizers = Set("ubsan", "asan") }.name
