@@ -34,7 +34,7 @@ From a list of profiles, `catalogue.files` renders:
 ```pkl
 // PklProject
 dependencies {
-  ["profile-catalogue"] { uri = "package://pkg.pkl-lang.org/github.com/ray-manaloto/cpp-utilities/profile-catalogue@0.1.0" }
+  ["profile-catalogue"] { uri = "package://pkg.pkl-lang.org/github.com/ray-manaloto/cpp-utilities/profile-catalogue@0.2.0" }
 }
 ```
 

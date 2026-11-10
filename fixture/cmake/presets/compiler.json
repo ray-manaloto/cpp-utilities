@@ -9,6 +9,13 @@
       }
     },
     {
+      "name": "compiler-clang23_1_5",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "clang23_1_5"
+      }
+    },
+    {
       "name": "compiler-gcc16_2_0",
       "hidden": true,
       "cacheVariables": {
@@ -34,6 +41,13 @@
       "hidden": true,
       "cacheVariables": {
         "PROFILE_COMPILER": "clangp2996_f17c8d6c"
+      }
+    },
+    {
+      "name": "compiler-clangp2996_562409c7",
+      "hidden": true,
+      "cacheVariables": {
+        "PROFILE_COMPILER": "clangp2996_562409c7"
       }
     }
   ]

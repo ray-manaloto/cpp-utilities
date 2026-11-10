@@ -32,6 +32,12 @@ compilers: Map<axes.Compiler, Compiler> = Map(
     c = Map("macos", "clang", "linux", "clang")
     cxx = Map("macos", "clang++", "linux", "clang++")
   },
+  "clang23_1_5", new Compiler {
+    id = "Clang"
+    version = "23.1.5"
+    c = Map("macos", "clang", "linux", "clang")
+    cxx = Map("macos", "clang++", "linux", "clang++")
+  },
   "gcc16_2_0", new Compiler {
     id = "GNU"
     version = "16.2.0"
@@ -55,6 +61,13 @@ compilers: Map<axes.Compiler, Compiler> = Map(
     id = "Clang"
     version = "21.0.0"
     commit = "f17c8d6c"
+    c = Map("macos", "clang-p2996", "linux", "clang-p2996")
+    cxx = Map("macos", "clang++-p2996", "linux", "clang++-p2996")
+  },
+  "clangp2996_562409c7", new Compiler {
+    id = "Clang"
+    version = "21.0.0"
+    commit = "562409c7"
     c = Map("macos", "clang-p2996", "linux", "clang-p2996")
     cxx = Map("macos", "clang++-p2996", "linux", "clang++-p2996")
   }

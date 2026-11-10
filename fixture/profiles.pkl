@@ -6,11 +6,11 @@ module profiles
 import "@profile-catalogue/profile.pkl"
 
 list: List<profile.Profile> = List(
-  new profile.Profile { system = "macos"; compiler = "clang23_1_4"; buildType = "debug"; sanitizers = Set("asan", "ubsan") },
-  new profile.Profile { system = "macos"; compiler = "clang23_1_4"; ipo = "ipo_on"; importStd = "importstd_on"; pch = "pch_on" },
+  new profile.Profile { system = "macos"; compiler = "clang23_1_5"; buildType = "debug"; sanitizers = Set("asan", "ubsan") },
+  new profile.Profile { system = "macos"; compiler = "clang23_1_5"; ipo = "ipo_on"; importStd = "importstd_on"; pch = "pch_on" },
   new profile.Profile { system = "macos"; compiler = "gcc16_2_0"; cxxStandard = "cxx26"; reflection = "refl_on"; pch = "pch_on" },
-  new profile.Profile { system = "macos"; compiler = "clangp2996_f17c8d6c"; cxxStandard = "cxx26"; reflection = "refl_on" },
-  new profile.Profile { system = "linux"; compiler = "clangp2996_f17c8d6c"; cxxStandard = "cxx26"; reflection = "refl_on"; launcher = "sccache" },
+  new profile.Profile { system = "macos"; compiler = "clangp2996_562409c7"; cxxStandard = "cxx26"; reflection = "refl_on" },
+  new profile.Profile { system = "linux"; compiler = "clangp2996_562409c7"; cxxStandard = "cxx26"; reflection = "refl_on"; launcher = "sccache" },
   new profile.Profile { system = "linux"; compiler = "gcc14_2_0"; targetCpu = "znver2" },
-  new profile.Profile { system = "linux"; compiler = "clang23_1_4"; sanitizers = Set("tsan"); targetCpu = "noavx" }
+  new profile.Profile { system = "linux"; compiler = "clang23_1_5"; sanitizers = Set("tsan"); targetCpu = "noavx" }
 )

@@ -1,6 +1,6 @@
 # Tools for the catalogue's own tests and the generic fixture.
 # Compilers are not pinned here: on macOS the fixture uses the machine's
-# clang 23.1.4 and gcc-16 16.2.0 from PATH, and the profile check module
+# clang 23.1.5, clang-p2996 and gcc-16 16.2.0 from PATH, and the profile check module
 # refuses a configure whose compiler version does not match the profile.
 [tools]
 pkl = "0.33.0"

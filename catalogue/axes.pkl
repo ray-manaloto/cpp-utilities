@@ -14,8 +14,10 @@ archs: List<Arch> = List("amd64", "arm64")
 
 /// Compiler. The value carries the upstream version, with `_` for dots;
 /// `clangp2996` carries the first eight hex digits of the fork commit instead.
-typealias Compiler = "clang23_1_4"|"gcc16_2_0"|"gcc14_2_0"|"appleclang21_0_0"|"clangp2996_f17c8d6c"
-compilers: List<Compiler> = List("clang23_1_4", "gcc16_2_0", "gcc14_2_0", "appleclang21_0_0", "clangp2996_f17c8d6c")
+typealias Compiler = "clang23_1_4"|"clang23_1_5"|"gcc16_2_0"|"gcc14_2_0"|"appleclang21_0_0"|"clangp2996_f17c8d6c"|"clangp2996_562409c7"
+compilers: List<Compiler> = List(
+  "clang23_1_4", "clang23_1_5", "gcc16_2_0", "gcc14_2_0", "appleclang21_0_0", "clangp2996_f17c8d6c", "clangp2996_562409c7"
+)
 
 typealias BuildType = "debug"|"release"|"relwithdebinfo"|"minsizerel"
 buildTypes: List<BuildType> = List("debug", "release", "relwithdebinfo", "minsizerel")

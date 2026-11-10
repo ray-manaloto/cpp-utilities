@@ -102,7 +102,7 @@ flags: List<Flag> = List(
   new Flag {
     axis = "reflection"
     value = "refl_on"
-    compilers = List("clangp2996_f17c8d6c")
+    compilers = List("clangp2996_f17c8d6c", "clangp2996_562409c7")
     languages = List("CXX")
     compile = List("-freflection", "-fexpansion-statements")
   }
