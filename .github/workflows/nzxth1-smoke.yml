@@ -1,0 +1,46 @@
+# Smoke test for the nzxth1desktop self-hosted runner (one job, fresh container, then gone).
+# Triggers follow the runner rule (windows-desktop omarchy/runner/README.md): push and workflow_dispatch only,
+# never pull_request, so fork code never reaches the PC. It builds nothing from this repo.
+name: nzxth1 smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/nzxth1-smoke.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nzxth1-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: [self-hosted, nzxth1, container, cpp-utilities]
+    timeout-minutes: 15
+    steps:
+      - name: Who and where
+        run: |
+          echo "user: $(id -un) uid $(id -u)"
+          echo "slot: ${GHA_SLOT:-unset}  build jobs: ${GHA_SLOT_JOBS:-unset}  nproc: $(nproc)"
+          uname -m
+          grep -E '^PRETTY_NAME' /etc/os-release
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Repo tools from the slot cache
+        run: |
+          mise trust
+          mise ls --current
+          cmake --version | head -1
+          ninja --version
+      - name: Configure and build a throwaway project
+        run: |
+          d=$(mktemp -d)
+          printf 'cmake_minimum_required(VERSION 3.28)\nproject(smoke CXX)\nadd_executable(smoke main.cpp)\n' > "$d/CMakeLists.txt"
+          printf '#include <cstdio>\nint main() { std::puts("built on nzxth1"); }\n' > "$d/main.cpp"
+          cmake -S "$d" -B "$d/build" -G Ninja
+          cmake --build "$d/build"
+          "$d/build/smoke"
