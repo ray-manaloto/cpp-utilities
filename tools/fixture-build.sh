@@ -1,6 +1,7 @@
 #!/bin/sh
 # Configures, builds and tests every fixture preset whose condition holds on
-# this machine. Configure runs the profile's rules and checks.
+# this machine. Configure runs the profile's rules and checks. A sanitizer
+# profile's test binary must hold that sanitizer's runtime symbols.
 set -eu
 cd "$(dirname "$0")/../fixture"
 presets=$(cmake --list-presets | sed -n 's/^ *"\(fixture-[^"]*\)".*/\1/p')
@@ -11,4 +12,11 @@ for p in $presets; do
   printf '%s\n' "$log" | grep '^-- Profile '
   cmake --build --preset "$p"
   ctest --preset "$p"
+  symbols=$(nm "build/${p#fixture-}/fixture_test")
+  for s in asan:__asan_init ubsan:__ubsan_handle_; do
+    case $p in
+      *"${s%%:*}"*) printf '%s\n' "$symbols" | grep -q "${s#*:}" ||
+        { echo "fixture: $p has no ${s#*:} symbol" >&2; exit 1; } ;;
+    esac
+  done
 done

@@ -2,11 +2,14 @@
 # CMAKE_PROJECT_INCLUDE; ProfileRules.cmake has already checked the axis values
 # and rules. It stops configure, listing every reason, when:
 # - a compiler's ID, version or fork commit is not the profile's compiler;
-# - a CMake setting the profile owns, or a flag its toolchain adds, was overridden;
+# - a CMake setting the profile owns, or a flag its toolchain adds, was overridden,
+#   including by a later flag that undoes it, in the base or a configuration's
+#   flags variable;
 # - the compiler or linker refuses a flag the profile adds, or IPO or
 #   import std is asked for and unavailable.
 include_guard(GLOBAL)
 include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ProfileOverrides.cmake")
 include(CheckCompilerFlag)
 include(CheckLinkerFlag)
 include(CheckIPOSupported)
@@ -70,12 +73,14 @@ function(_profile_check_build)
   foreach(lang IN LISTS languages)
     profile_flags(${lang} compile lang_link)
     list(APPEND link ${lang_link})
-    separate_arguments(actual NATIVE_COMMAND "${CMAKE_${lang}_FLAGS}")
+    _profile_tokens("${CMAKE_${lang}_FLAGS}" actual)
     foreach(flag IN LISTS compile)
-      if(NOT flag IN_LIST actual)
+      _profile_written_out("${flag}" written_out)
+      if(NOT flag IN_LIST actual AND NOT (written_out AND written_out IN_LIST actual))
         list(APPEND refusals "CMAKE_${lang}_FLAGS lacks ${flag}, which the profile adds")
       endif()
     endforeach()
+    _profile_undone_in("${compile}" CMAKE_${lang}_FLAGS refusals)
     set(CMAKE_REQUIRED_QUIET ON)
     foreach(flag IN LISTS compile)
       string(MAKE_C_IDENTIFIER "PROFILE_HAS_${lang}_FLAG_${flag}" result)
@@ -87,7 +92,10 @@ function(_profile_check_build)
     endforeach()
   endforeach()
   list(REMOVE_DUPLICATES link)
-  separate_arguments(actual NATIVE_COMMAND "${CMAKE_EXE_LINKER_FLAGS}")
+  _profile_tokens("${CMAKE_EXE_LINKER_FLAGS}" actual)
+  foreach(kind IN ITEMS EXE SHARED MODULE)
+    _profile_undone_in("${link}" CMAKE_${kind}_LINKER_FLAGS refusals)
+  endforeach()
   foreach(flag IN LISTS link)
     if(NOT flag IN_LIST actual)
       list(APPEND refusals "CMAKE_EXE_LINKER_FLAGS lacks ${flag}, which the profile adds")

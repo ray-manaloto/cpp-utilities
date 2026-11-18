@@ -5,6 +5,29 @@
 # module then refuses any compiler or flag that differs from the profile.
 include("${CMAKE_CURRENT_LIST_DIR}/ProfileCommon.cmake")
 
+# A Profile preset sets PROFILE_PRESET in the environment as well as PROFILE_* in
+# the cache. A changed compiler makes CMake delete the cache and configure again
+# without the preset's cache variables: no PROFILE_* is left, and with it go the
+# rules module and the check module. The environment survives, so a build that
+# has the preset's name but none of its values stops here instead of running
+# unchecked. (A vcpkg triplet passes the ABI axes, so PROFILE_COMPILER is set there.)
+# PROFILE_SOURCE_DIR limits this to the preset's own source tree: a child build
+# that inherits the environment, such as an ExternalProject or a try_compile
+# project, has another source directory and is left alone.
+# Such a child returns at once, so the flags it set for itself stay. Known
+# gap: a child that configures this same source directory into another build
+# directory looks like a lost cache and is refused.
+if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER
+    AND "${CMAKE_SOURCE_DIR}" STREQUAL "$ENV{PROFILE_SOURCE_DIR}")
+  message(FATAL_ERROR "Profile $ENV{PROFILE_PRESET}: the build directory lost the profile. "
+    "Changing CMAKE_C_COMPILER or CMAKE_CXX_COMPILER on an existing build directory makes "
+    "CMake delete its cache, and the profile's values and checks with it. "
+    "Delete the build directory and configure the preset again.")
+endif()
+if(DEFINED ENV{PROFILE_PRESET} AND NOT DEFINED PROFILE_COMPILER)
+  return()
+endif()
+
 foreach(axis IN LISTS PROFILE_NAME_AXES)
   string(TOUPPER "PROFILE_${axis}" var)
   list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES "${var}")
