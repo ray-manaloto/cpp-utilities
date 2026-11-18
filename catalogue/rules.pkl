@@ -35,6 +35,7 @@ local compilerSystemRules: List<Rule> =
           oneOf("compiler", List(k)), noneOf("system", systems))))
 
 local clangOnly: List<String> = compilers.clangFamily
+local gnuOnly: List<String> = compilers.gnuFamily
 
 rules: List<Rule> = compilerSystemRules + List(
   // Sanitizers that cannot share a process.
@@ -49,6 +50,12 @@ rules: List<Rule> = compilerSystemRules + List(
   // macOS runs only ubsan, and asan with ubsan; the rest run on Linux.
   rule("sanitizer_macos", "macos allows only the sanitizers ubsan, and asan with ubsan", List(
     oneOf("system", List("macos")), noneOf("sanitizer", List("none", "ubsan", "asan_ubsan")))),
+  // The conda g++ on macOS ships no libasan or libubsan, so the compiler test fails
+  // at link time with `library not found for -lubsan`. Homebrew's g++-16 does ship
+  // them and links, so this refuses more than the evidence needs: the catalogue
+  // does not know which build a profile's gcc is, and refuses until a profile can say.
+  rule("sanitizer_gcc_macos", "gcc on macos runs no sanitizer: the conda g++ has no libasan or libubsan", List(
+    oneOf("system", List("macos")), oneOf("compiler", gnuOnly), noneOf("sanitizer", List("none")))),
 
   // Instrumentation.
   rule("xray_clang", "xray needs a clang compiler", List(oneOf("instrumentation", List("xray")), noneOf("compiler", clangOnly))),
@@ -69,7 +76,11 @@ rules: List<Rule> = compilerSystemRules + List(
     oneOf("import_std", List("importstd_on")), noneOf("generator", List("ninja", "ninja_multi_config")))),
   rule("importstd_standard", "import std needs cxx23 or later", List(oneOf("import_std", List("importstd_on")), oneOf("cxx_standard", List("cxx20")))),
 
-  // Precompiled headers.
-  rule("pch_sccache", "pch is refused on gcc16_2_0 under sccache", List(
-    oneOf("pch", List("pch_on")), oneOf("compiler", List("gcc16_2_0")), oneOf("launcher", List("sccache"))))
+  // Precompiled headers. sccache cannot see a macro change inside a GCC precompiled
+  // header: the -E output is unchanged, so it serves stale objects (mozilla/sccache#2562,
+  // open and unfixed in v0.19.0; see also #615). ccache has the same GCC limitation
+  // (ccache/ccache#1668, #1686), and LLVM turns PCH off under sccache for the same
+  // reason (llvm/llvm-project#176420). Clang is allowed.
+  rule("pch_sccache", "pch is refused on GCC under sccache", List(
+    oneOf("pch", List("pch_on")), oneOf("compiler", gnuOnly), oneOf("launcher", List("sccache"))))
 )
